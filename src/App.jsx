@@ -988,7 +988,7 @@ function AboutPage({ go, mobile, px }) {
             <div style={{ width:36,height:2,background:C.gold,marginBottom:20 }}/>
             <h1 className="pf" style={{ fontSize: mobile ? "clamp(32px,9vw,52px)" : "clamp(36px,5.5vw,60px)",fontWeight:900,color:C.cream,marginBottom:18,lineHeight:1.05,letterSpacing:"-.02em" }}>John Thornton</h1>
             <p className="lb" style={{ fontSize: mobile ? 17 : 19,fontStyle:"italic",color:"rgba(244,239,230,.65)",marginBottom:16,lineHeight:1.65 }}>Cybersecurity professional. Author.<br/>Observer of invisible systems.</p>
-            <p className="ss" style={{ fontSize:15,color:"rgba(244,239,230,.45)",lineHeight:1.8 }}>Writing at the intersection of how systems work and how people fail to see themselves as systems.</p>
+            <p className="ss" style={{ fontSize:15,color:"rgba(244,239,230,.45)",lineHeight:1.8 }}>Writing about the intersection of how systems work and how people fail to see themselves as worth troubleshooting.</p>
           </div>
           {!mobile && <BookCoverDark size={240}/>}
         </div>
