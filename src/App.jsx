@@ -909,6 +909,7 @@ function ThinkingPage({ essays, setEssay, mobile, px, scrollTargetRef }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
   const [copied, setCopied] = useState(false);
+  const [linkedInDraft, setLinkedInDraft] = useState(null);
 
   function shareUrl() {
     return window.location.origin + "/#essay-" + essay.id;
@@ -926,8 +927,13 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener,noreferrer");
   }
 
-  function shareLinkedIn() {
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener,noreferrer");
+  function openLinkedIn() {
+    setLinkedInDraft(`"${essay.hook}"\n\n${essay.title}\n${shareUrl()}`);
+  }
+
+  function postToLinkedIn() {
+    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(linkedInDraft)}`, "_blank", "noopener,noreferrer");
+    setLinkedInDraft(null);
   }
   const related = essay.related.map(id=>all.find(e=>e.id===id)).filter(Boolean);
   const totalH = typeof document!=="undefined" ? document.body?.scrollHeight - window.innerHeight : 1;
@@ -935,6 +941,36 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
 
   return (
     <div style={{ background:C.g100 }}>
+      {/* LinkedIn compose modal */}
+      {linkedInDraft !== null && (
+        <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(13,23,32,.72)",display:"flex",alignItems:"center",justifyContent:"center",padding:20 }}
+          onClick={() => setLinkedInDraft(null)}>
+          <div style={{ background:"white",maxWidth:520,width:"100%",padding: mobile ? "28px 22px" : "36px 40px",boxShadow:"0 24px 64px rgba(0,0,0,.3)" }}
+            onClick={e => e.stopPropagation()}>
+            <p className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.gold,marginBottom:8 }}>Share on LinkedIn</p>
+            <p className="ss" style={{ fontSize:13,color:C.g600,lineHeight:1.7,marginBottom:16 }}>
+              Add your thoughts at the top, then post.
+            </p>
+            <textarea
+              autoFocus
+              value={linkedInDraft}
+              onChange={e => setLinkedInDraft(e.target.value)}
+              rows={9}
+              style={{ width:"100%",boxSizing:"border-box",fontFamily:"'Source Sans 3',sans-serif",fontSize:14,lineHeight:1.75,color:C.g800,border:`1px solid ${C.g200}`,padding:"14px 16px",resize:"vertical",outline:"none",background:C.g100,marginBottom:20 }}
+            />
+            <div style={{ display:"flex",gap:10,justifyContent:"flex-end" }}>
+              <button onClick={() => setLinkedInDraft(null)}
+                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"9px 18px",background:"transparent",color:C.g600,border:`1px solid ${C.g200}`,cursor:"pointer" }}>
+                Cancel
+              </button>
+              <button onClick={postToLinkedIn} className="btn-d" style={{ fontSize:11 }}>
+                Post to LinkedIn →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reading progress */}
       <div style={{ position:"fixed",top: mobile ? 60 : 68,left:0,right:0,height:2,background:`rgba(184,148,63,.15)`,zIndex:200 }}>
         <div style={{ height:"100%",background:C.gold,width:`${prog}%`,transition:"width .1s linear" }}/>
@@ -1005,7 +1041,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
             <span className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",color:C.g400,marginRight:4 }}>Share</span>
             {[
               { label: "Twitter / X", fn: shareTwitter },
-              { label: "LinkedIn", fn: shareLinkedIn },
+              { label: "LinkedIn", fn: openLinkedIn },
               { label: copied ? "Copied!" : "Copy Link", fn: copyLink },
             ].map(({ label, fn }) => (
               <button key={label} onClick={fn}
