@@ -265,25 +265,27 @@ export default function App() {
     fetchEssays().then(data => { if (data && data.length) setEssays(data); });
   }, []);
 
-  // Deep link: #essay-{id} or #audit
+  // Deep link: /essay/{id}
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith("#essay-")) {
-      const id = parseInt(hash.replace("#essay-", ""), 10);
-      if (!isNaN(id)) {
-        const found = essays.find(e => e.id === id);
-        if (found) setEssay(found);
-      }
-    } else if (hash === "#audit") {
-      setPage("audit");
+    const path = window.location.pathname;
+    const match = path.match(/^\/essay\/(\d+)/);
+    if (match) {
+      const id = parseInt(match[1], 10);
+      const found = essays.find(e => e.id === id);
+      if (found) setEssay(found);
     }
   }, [essays]);
+
+  const openEssay = (e) => {
+    setEssay(e);
+    window.history.replaceState(null, "", e ? `/essay/${e.id}` : "/");
+  };
 
   useEffect(() => {
     if (scrollTargetRef.current) return;
     window.scrollTo({ top:0, behavior:"smooth" });
   }, [page, essay]);
-  const go = (p) => { setPage(p); setEssay(null); setMenuOpen(false); window.history.replaceState(null, "", window.location.pathname); };
+  const go = (p) => { setPage(p); setEssay(null); setMenuOpen(false); window.history.replaceState(null, "", "/"); };
   const goToIdeas = () => { scrollTargetRef.current = "distilled-ideas"; go("thinking"); };
 
   // Global styles
@@ -395,9 +397,9 @@ export default function App() {
 
       {/* ── PAGES ── */}
       {essay
-        ? <EssayPage essay={essay} all={essays} setEssay={setEssay} scrollY={scrollY} mobile={mobile} px={px}/>
-        : page==="home"      ? <HomePage go={go} goToIdeas={goToIdeas} essays={essays} setEssay={setEssay} scrollY={scrollY} mobile={mobile} px={px}/>
-        : page==="thinking"  ? <ThinkingPage essays={essays} setEssay={setEssay} mobile={mobile} px={px} scrollTargetRef={scrollTargetRef}/>
+        ? <EssayPage essay={essay} all={essays} setEssay={openEssay} scrollY={scrollY} mobile={mobile} px={px}/>
+        : page==="home"      ? <HomePage go={go} goToIdeas={goToIdeas} essays={essays} setEssay={openEssay} scrollY={scrollY} mobile={mobile} px={px}/>
+        : page==="thinking"  ? <ThinkingPage essays={essays} setEssay={openEssay} mobile={mobile} px={px} scrollTargetRef={scrollTargetRef}/>
         : page==="audit"     ? <SystemAuditPage mobile={mobile} px={px} essays={essays}/>
         : page==="cohort"    ? <CohortPage mobile={mobile} px={px}/>
         : page==="work"      ? <WorkPage mobile={mobile} px={px}/>
@@ -912,7 +914,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
   const [linkedInDraft, setLinkedInDraft] = useState(null);
 
   function shareUrl() {
-    return window.location.origin + "/#essay-" + essay.id;
+    return window.location.origin + "/essay/" + essay.id;
   }
 
   function copyLink() {
