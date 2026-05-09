@@ -1012,11 +1012,8 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
   function openShare() {
     const url = shareUrl();
     const hashtags = themeHashtags[essay.theme] || "#Leadership #WorkplaceCulture #PersonalGrowth";
-    const quote = essay.pullQuote || essay.hook;
     const draft = [
       essay.hook,
-      "",
-      `"${quote}"`,
       "",
       `Full essay → ${url}`,
       "",

@@ -412,6 +412,130 @@ function SectionTitle({ children }) {
   );
 }
 
+// ─── BOOK QUOTE LIBRARY DATA ──────────────────────────────────────────────────
+const BOOK_QUOTES = [
+  { chapter: 1, title: "The Weight That Doesn't Show", theme: "Pressure", quotes: [
+    "Normal is the most convincing disguise pressure can wear. It doesn't announce itself as danger. It doesn't demand intervention.",
+    "Responsibility has a way of narrowing the future until the present sounds like the only survivable option.",
+    "My body noticed before my mind did.",
+    "I had been living without margin. Without redundancy. Everything looked secure. Everything functioned. And yet, I was vulnerable.",
+  ]},
+  { chapter: 2, title: "When Hard Work Stops Working", theme: "Pressure", quotes: [
+    "Overload doesn't erase intelligence. It restricts access to it. You can still see clearly for everyone else. You just can't do it for yourself.",
+    "Blaming yourself keeps the world orderly. If you are the problem, the solution stays within reach.",
+    "Nothing was failing because I was broken. Things were breaking because I was overloaded and blaming myself for it.",
+    "When a system slows down, we don't tell it to work harder. We reduce the load, expand capacity, or change how it operates. But when the same thing happens to us, effort becomes the only solution we consider.",
+  ]},
+  { chapter: 3, title: "The Cost of Being Capable", theme: "Pressure", quotes: [
+    "Pressure doesn't teach lessons once. It teaches responses. Once a response works, even temporarily, it becomes the default.",
+    "Pressure removes visibility. It narrows your world. The road stops feeling like a highway and starts feeling like a tunnel.",
+    "The idea of handling pressure assumes that pressure is something we can control. That assumption is false. We only have control of ourselves.",
+    "I realized I couldn't outwork this anymore.",
+  ]},
+  { chapter: 4, title: "When Everything Feels Urgent", theme: "Pressure", quotes: [
+    "Pressure is a signal, not a test. Tests are meant to be passed. Signals are meant to be interpreted.",
+    "Confusing the two turns endurance into virtue and exhaustion into evidence of dedication.",
+    "What if pressure is not proof of failure, but evidence that something was misaligned?",
+    "Awareness alone can change how pressure affects your relationships, your work, and your emotional health.",
+  ]},
+  { chapter: 5, title: "How Pressure Learns Your Name", theme: "Pressure", quotes: [
+    "Pressure itself is neutral. It doesn't tell us what to do. It responds to what we believe about it.",
+    "Pressure was not asking me to become stronger. It was asking me to see more clearly.",
+    "The danger isn't pressure. The danger is a bad interpretation left unexamined.",
+    "I stopped asking how much pressure I could handle and started asking what it was telling me.",
+  ]},
+  { chapter: 6, title: "The Illusion of Control", theme: "Pressure", quotes: [
+    "Control often enters disguised as responsibility.",
+    "Visibility alone changes how pressure behaves.",
+    "The danger lives in the background processes. These are the inputs we do not choose and rarely question.",
+    "Seeing the inputs didn't make the pressure disappear. It didn't simplify my life or give me immediate answers. But it shifted something.",
+  ]},
+  { chapter: 7, title: "Why Rest Doesn't Fix It", theme: "Urgency", quotes: [
+    "Tying your performance to your identity can be the type of self-configuration that will make every part of life harder.",
+    "Rest threatened a system I'd spent years building. If I stopped, something I couldn't manage might surface.",
+    "There is no finish line for being reliable. No signal that says you've done enough for today.",
+    "I was asking the wrong question. Instead of asking why I was exhausted, I kept asking how to keep going.",
+  ]},
+  { chapter: 8, title: "Carrying More Than You Realize", theme: "Urgency", quotes: [
+    "I blended my responsibilities and became a Swiss-army knife for my team. Tools designed to do everything well aren't optimized to do anything exceptionally.",
+    "Boundaries are not rules that determine what we can't do. They protect what we value most.",
+    "Crafted by time, perseverance, and many failures, your reputation can lead to unspoken expectations.",
+    "It was from that inability to say no that I found myself carrying responsibilities that were not mine.",
+  ]},
+  { chapter: 9, title: "When Everything Feels Important", theme: "Urgency", quotes: [
+    "The problem wasn't me. The problem was that everything around me had been arranged in a way that could only produce chaos.",
+    "I had built a system that could never function as designed. It was operating over capacity. Its configuration had drifted far off baseline.",
+    "This is where I lost focus on my life and my career. Not because I cared too much, but because the system could not sustain that level of care.",
+    "I had reached the end. There was no light at the end of a tunnel. No ladder to climb. I was spiraling inward, trapped in a loop I could not exit alone.",
+  ]},
+  { chapter: 10, title: "The Rules You Never Chose", theme: "Internal Rules", quotes: [
+    "The pain was caused by the way I was configured to handle it.",
+    "If the inputs didn't change and the outcome didn't change, the only variable worth examining was the system itself.",
+    "Rules like these don't stay contained. They don't just shape how you respond to pressure. They determine how and when you give yourself permission to stop.",
+    "That ceiling can carry forward for decades without showing itself in daily life.",
+  ]},
+  { chapter: 11, title: "How Urgency Steals Your Margin", theme: "Internal Rules", quotes: [
+    "Urgency doesn't just steal rest. It steals discernment. It collapses reflection into reaction.",
+    "Fear is often the architect of our rules, and what fear builds, it builds to last.",
+    "Urgency whispers lies that compound over time, like every other misconfiguration built from a bad reading of life's inputs.",
+    "Urgency led me to perform at a higher level than my peers.",
+  ]},
+  { chapter: 12, title: "Interruption Before Inspection", theme: "Internal Rules", quotes: [
+    "Urgency is not neutral. It always takes something with it.",
+    "The problem isn't pressure itself, but how quickly meaning gets assigned to it.",
+    "Visibility was never meant to change the system. It was meant to reveal where authority lives.",
+    "Inspection, at this stage, isn't about improvement. It's about curiosity.",
+  ]},
+  { chapter: 13, title: "Reconfiguring What You Carry", theme: "Reconfiguration", quotes: [
+    "Change doesn't begin by fighting urgency. It begins by questioning the rule that gave urgency authority in the first place.",
+    "Most people don't live by values alone. They live by rules they no longer remember adopting.",
+    "The system doesn't need to be broken, destroyed, or rebuilt from the ground up. It needs to be consulted. And consultation is the beginning of reconfiguration.",
+    "Urgency becomes the messenger that carries authority forward. It does not argue or persuade, it merely executes.",
+  ]},
+  { chapter: 14, title: "The Moment After Awareness", theme: "Reconfiguration", quotes: [
+    "You have to stop treating yourself as the faulty component.",
+    "Not everything that feels heavy is dangerous. Not everything that hurts needs to be removed. And not every rule that once kept you safe should still have authority.",
+    "The goal is not to become less affected by pressure. It's to become more discerning about what pressure is allowed to reach you.",
+    "Before you decide what needs to change, you need to understand what you're actually carrying.",
+  ]},
+  { chapter: 15, title: "What You're Actually Exposed To", theme: "Reconfiguration", quotes: [
+    "Some people aren't only overloaded — they are often over-reachable.",
+    "Reliability without boundaries turns into exposure.",
+    "A system that is always reachable cannot protect its own judgment. And judgment is what keeps pressure from becoming corrosive.",
+    "When nothing can wait, urgency becomes the default mode of operation.",
+  ]},
+  { chapter: 16, title: "When Your Baseline Quietly Changed", theme: "Reconfiguration", quotes: [
+    "Baselines don't collapse. They drift.",
+    "Resilience without review eventually becomes entrapment.",
+    "The strain isn't coming from what you're carrying now. It's coming from what you never put down.",
+    "You stop asking whether something is acceptable. You only ask whether it's manageable.",
+  ]},
+  { chapter: 17, title: "The Rules That Act Like Open Ports", theme: "Reconfiguration", quotes: [
+    "Rules are not bad, but unexamined rules are dangerous.",
+    "Boundaries aren't moral stances. They're configuration choices.",
+    "Urgency will always find its way into these rules. It doesn't need permission of its own. It exploits the permission that already exists.",
+    "The risk isn't that a port is open. The risk is when no one remembers why a port is open.",
+  ]},
+  { chapter: 18, title: "Inspection Without Action", theme: "Reconfiguration", quotes: [
+    "Nothing stops running just because it's been seen.",
+    "Awareness doesn't close the port — it reveals who has permission to use it.",
+    "Inspection doesn't ask you to change behavior. It asks you to notice authority.",
+    "Visibility was never meant to change the system. It was meant to reveal where control lives.",
+  ]},
+  { chapter: 19, title: "Choosing What You Let Reach You", theme: "Reconfiguration", quotes: [
+    "Most people think freedom comes from removing pressure. But freedom often begins by choosing what you let reach you, and under what conditions.",
+    "Discernment is the ability to pause long enough to interpret what is arriving, instead of reacting automatically to its pressure.",
+    "Old authority does not dissolve simply because new intentions are declared.",
+    "Urgency becomes information instead of command. Rules become visible instead of absolute. Reachability becomes selective instead of reflexive.",
+  ]},
+  { chapter: 20, title: "Living with Margin", theme: "Reconfiguration", quotes: [
+    "You are not broken. You are not weak. And you are not failing at life. You are responding exactly as a system responds when it has been configured to absorb pressure without question.",
+    "Living with margin does not mean doing less. It means doing what matters without letting everything else pretend it does too.",
+    "To let some things wait, not because they are unimportant, but because you are.",
+    "This is what it means to live securely. Not protected from life. Not insulated from difficulty. But configured with intention.",
+  ]},
+];
+
 // ─── CUSTOM CARD GENERATOR ───────────────────────────────────────────────────
 function CustomCardTab() {
   const [quote, setQuote]       = useState("");
@@ -421,6 +545,8 @@ function CustomCardTab() {
   const [previewSrc, setPreviewSrc] = useState(null);
   const [copied, setCopied]     = useState(false);
   const [shareDraft, setShareDraft] = useState("");
+  const [selectedChapter, setSelectedChapter] = useState(0);
+  const previewRef = useRef(null);
 
   const themeHashtags = {
     Pressure:         "#Leadership #Burnout #WorkplaceCulture #HighPerformance #Resilience",
@@ -468,7 +594,22 @@ function CustomCardTab() {
     });
   }
 
+  function useQuote(q, th, lbl) {
+    setQuote(q);
+    setTheme(th);
+    setLabel(lbl);
+    const params = new URLSearchParams({ quote: q, theme: th });
+    if (lbl) params.set("label", lbl);
+    const cardUrl = `${OG_ORIGIN}/api/og/custom?${params.toString()}`;
+    const hashtags = themeHashtags[th] || "#Leadership #WorkplaceCulture";
+    const draft = [`"${q}"`, "", `— John Thornton`, `From: ${lbl}`, "", shareLink, "", hashtags].join("\n");
+    setShareDraft(draft);
+    setPreviewSrc(cardUrl);
+    setTimeout(() => previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
+  }
+
   const canGenerate = quote.trim().length > 0;
+  const ch = BOOK_QUOTES[selectedChapter];
 
   return (
     <div>
@@ -479,6 +620,60 @@ function CustomCardTab() {
         <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400, margin: 0 }}>
           Drop any line from the book or anywhere — generate a branded 1200×630 card and share it directly.
         </p>
+      </div>
+
+      {/* Book Quote Library */}
+      <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 32px", marginBottom: 20 }}>
+        <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.gold, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
+          Book Quote Library — {BOOK_QUOTES.length} Chapters · {BOOK_QUOTES.reduce((n, c) => n + c.quotes.length, 0)} Quotes
+        </p>
+
+        {/* Chapter selector */}
+        <div style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 20, paddingBottom: 4 }}>
+          {BOOK_QUOTES.map((c, i) => (
+            <button key={i} onClick={() => setSelectedChapter(i)} style={{
+              flexShrink: 0, whiteSpace: "nowrap",
+              padding: "5px 13px", fontSize: 11, fontWeight: 700, letterSpacing: ".06em",
+              fontFamily: "'Source Sans 3',sans-serif", cursor: "pointer", border: "none",
+              background: selectedChapter === i ? C.navy : C.g200,
+              color: selectedChapter === i ? "white" : C.g600,
+            }}>
+              Ch {c.chapter}
+            </button>
+          ))}
+        </div>
+
+        {/* Chapter heading */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 700, color: C.navy }}>
+            Chapter {ch.chapter} — {ch.title}
+          </span>
+          <span style={{
+            fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700,
+            letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 9px",
+            background: `${CARD_TC[ch.theme]?.hex}18`, color: CARD_TC[ch.theme]?.hex,
+            border: `1px solid ${CARD_TC[ch.theme]?.hex}40`,
+          }}>{ch.theme}</span>
+        </div>
+
+        {/* Quote rows */}
+        {ch.quotes.map((q, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 16, padding: "14px 0", borderTop: `1px solid ${C.g200}`, marginTop: i === 0 ? 14 : 0 }}>
+            <p style={{ flex: 1, margin: 0, fontFamily: "Georgia,serif", fontSize: 14, fontStyle: "italic", color: C.navy, lineHeight: 1.65 }}>
+              &ldquo;{q}&rdquo;
+            </p>
+            <button
+              onClick={() => useQuote(q, ch.theme, `Chapter ${ch.chapter} — ${ch.title}`)}
+              style={{
+                flexShrink: 0, padding: "8px 18px", background: C.gold, color: "white",
+                border: "none", cursor: "pointer", fontFamily: "'Source Sans 3',sans-serif",
+                fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}>
+              Use →
+            </button>
+          </div>
+        ))}
       </div>
 
       {/* Form */}
@@ -531,7 +726,7 @@ function CustomCardTab() {
 
       {/* Preview + share */}
       {previewSrc && (
-        <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 32px" }}>
+        <div ref={previewRef} style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 32px" }}>
           <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.g400, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
             Preview
           </p>
