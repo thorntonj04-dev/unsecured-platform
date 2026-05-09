@@ -34,8 +34,7 @@ export default async function handler(req) {
 
   const label = essay.title.length > 65 ? essay.title.slice(0, 62) + '…' : essay.title;
 
-  // Larger font for short quotes, smaller for long ones
-  const quoteFontSize = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
+  const quoteFontSize = quote.length > 130 ? 34 : quote.length > 85 ? 40 : 48;
 
   return new ImageResponse(
     h('div', {
@@ -81,9 +80,9 @@ export default async function handler(req) {
               borderColor: theme.hex,
               background: theme.rgba,
               color: theme.hex,
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: 700,
-              letterSpacing: '0.22em',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
             },
           }, essay.theme),
@@ -97,12 +96,12 @@ export default async function handler(req) {
           h('div', {
             style: {
               display: 'flex',
-              fontSize: 13,
+              fontSize: 17,
               fontWeight: 700,
               color: 'rgba(184,148,63,0.6)',
-              letterSpacing: '0.2em',
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
-              marginBottom: 18,
+              marginBottom: 20,
             },
           }, `FROM: ${label}`),
 
@@ -146,21 +145,21 @@ export default async function handler(req) {
             h('div', {
               style: {
                 display: 'flex',
-                fontSize: 17,
-                fontWeight: 700,
+                fontSize: 30,
+                fontWeight: 800,
                 color: '#b8943f',
-                letterSpacing: '0.05em',
+                letterSpacing: '0.04em',
               },
             }, 'John Thornton'),
             h('div', {
               style: {
                 display: 'flex',
-                fontSize: 14,
+                fontSize: 19,
                 fontWeight: 400,
                 color: 'rgba(244,239,230,0.35)',
                 letterSpacing: '0.1em',
               },
-            }, 'unsecured.info'),
+            }, 'unsecuredsystem.com'),
           ),
           // Faint wordmark
           h('div', {

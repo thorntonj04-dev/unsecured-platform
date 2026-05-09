@@ -43,7 +43,7 @@ function CardPreview({ essay }) {
   const rawQuote = essay.pullQuote || essay.hook || "";
   const quote = rawQuote.length > 185 ? rawQuote.slice(0, 182) + "…" : rawQuote;
   const label = essay.title.length > 65 ? essay.title.slice(0, 62) + "…" : essay.title;
-  const qfs = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
+  const qfs = quote.length > 130 ? 34 : quote.length > 85 ? 40 : 48;
 
   return (
     <div ref={wrapRef} style={{ width: "100%", height: Math.round(630 * scale), overflow: "hidden" }}>
@@ -51,12 +51,12 @@ function CardPreview({ essay }) {
         <div style={{ width: 8, height: "100%", background: "#b8943f", flexShrink: 0 }} />
         <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: "52px 76px 52px 72px", justifyContent: "space-between" }}>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <span style={{ padding: "6px 18px", border: `1px solid ${theme.hex}`, background: theme.rgba, color: theme.hex, fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "sans-serif" }}>
+            <span style={{ padding: "6px 18px", border: `1px solid ${theme.hex}`, background: theme.rgba, color: theme.hex, fontSize: 15, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", fontFamily: "sans-serif" }}>
               {essay.theme}
             </span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(184,148,63,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 18, fontFamily: "sans-serif" }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "rgba(184,148,63,0.6)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20, fontFamily: "sans-serif" }}>
               FROM: {label}
             </div>
             <div style={{ height: 1, background: "rgba(184,148,63,0.45)", marginBottom: 32 }} />
@@ -66,8 +66,8 @@ function CardPreview({ essay }) {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <div style={{ fontSize: 17, fontWeight: 700, color: "#b8943f", letterSpacing: "0.05em", fontFamily: "sans-serif" }}>John Thornton</div>
-              <div style={{ fontSize: 14, color: "rgba(244,239,230,0.35)", letterSpacing: "0.1em", fontFamily: "sans-serif" }}>unsecured.info</div>
+              <div style={{ fontSize: 30, fontWeight: 800, color: "#b8943f", letterSpacing: "0.04em", fontFamily: "sans-serif" }}>John Thornton</div>
+              <div style={{ fontSize: 19, color: "rgba(244,239,230,0.35)", letterSpacing: "0.1em", fontFamily: "sans-serif" }}>unsecuredsystem.com</div>
             </div>
             <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(244,239,230,0.09)", letterSpacing: "0.35em", fontFamily: "sans-serif" }}>UNSECURED</div>
           </div>
@@ -79,7 +79,7 @@ function CardPreview({ essay }) {
 
 // Edge Functions don't run under Vite dev server — point at production origin locally.
 const OG_ORIGIN = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-  ? "https://unsecured.info"
+  ? "https://unsecuredsystem.com"
   : "";
 
 const THEMES = ["All","Pressure","Urgency","Internal Rules","Reconfiguration"];

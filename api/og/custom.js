@@ -29,7 +29,7 @@ export default async function handler(req) {
   }
 
   const tc = TC[theme] || TC.Pressure;
-  const quoteFontSize = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
+  const quoteFontSize = quote.length > 130 ? 34 : quote.length > 85 ? 40 : 48;
 
   // Build middle-section children dynamically so the label row is
   // omitted entirely when not provided (Satori has no display:none).
@@ -39,12 +39,12 @@ export default async function handler(req) {
       h('div', {
         style: {
           display: 'flex',
-          fontSize: 13,
+          fontSize: 17,
           fontWeight: 700,
           color: 'rgba(184,148,63,0.6)',
-          letterSpacing: '0.2em',
+          letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          marginBottom: 18,
+          marginBottom: 20,
         },
       }, label),
     );
@@ -106,9 +106,9 @@ export default async function handler(req) {
               borderColor: tc.hex,
               background: tc.rgba,
               color: tc.hex,
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: 700,
-              letterSpacing: '0.22em',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
             },
           }, theme),
@@ -121,11 +121,11 @@ export default async function handler(req) {
         },
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 5 } },
             h('div', {
-              style: { display: 'flex', fontSize: 17, fontWeight: 700, color: '#b8943f', letterSpacing: '0.05em' },
+              style: { display: 'flex', fontSize: 30, fontWeight: 800, color: '#b8943f', letterSpacing: '0.04em' },
             }, author),
             h('div', {
-              style: { display: 'flex', fontSize: 14, fontWeight: 400, color: 'rgba(244,239,230,0.35)', letterSpacing: '0.1em' },
-            }, 'unsecured.info'),
+              style: { display: 'flex', fontSize: 19, fontWeight: 400, color: 'rgba(244,239,230,0.35)', letterSpacing: '0.1em' },
+            }, 'unsecuredsystem.com'),
           ),
           h('div', {
             style: { display: 'flex', fontSize: 15, fontWeight: 900, color: 'rgba(244,239,230,0.09)', letterSpacing: '0.35em' },
