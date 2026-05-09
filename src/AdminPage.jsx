@@ -394,10 +394,18 @@ function SectionTitle({ children }) {
 }
 
 // ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
+// Edge Functions don't run under Vite's dev server, so resolve images
+// against the production origin when running locally.
+const OG_ORIGIN = (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"))
+  ? "https://unsecured.info"
+  : "";
+
 function CardNoteItem({ essay, note, onChange }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const hasNote = note.trim().length > 0;
+  const imgSrc = `${OG_ORIGIN}/api/og/${essay.id}`;
 
   return (
     <div style={{
@@ -407,10 +415,10 @@ function CardNoteItem({ essay, note, onChange }) {
       transition: "border-color .2s",
     }}>
       {/* OG card preview */}
-      <div style={{ position: "relative", background: "#0d1720", aspectRatio: "1200/630" }}>
+      <div style={{ position: "relative", background: "#0d1720" }}>
         {!imgError && (
           <img
-            src={`/api/og/${essay.id}`}
+            src={imgSrc}
             alt={`Card: ${essay.title}`}
             loading="lazy"
             onLoad={() => setImgLoaded(true)}
@@ -419,13 +427,17 @@ function CardNoteItem({ essay, note, onChange }) {
           />
         )}
         {!imgLoaded && !imgError && (
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#0d1720", padding: "48px 32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.25)", letterSpacing: ".12em", textTransform: "uppercase" }}>Loading…</span>
           </div>
         )}
         {imgError && (
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.25)", letterSpacing: ".12em" }}>Image unavailable</span>
+          <div style={{ background: "#0d1720", padding: "48px 32px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
+            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.3)", letterSpacing: ".08em" }}>Card failed to load</span>
+            <a href={imgSrc} target="_blank" rel="noopener noreferrer"
+              style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: C.gold, textDecoration: "none" }}>
+              Open directly →
+            </a>
           </div>
         )}
       </div>
