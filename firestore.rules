@@ -27,5 +27,17 @@ service cloud.firestore {
       allow create: if true;
     }
 
+    // Subscribers: public create, auth-only read
+    match /subscribers/{id} {
+      allow read: if request.auth != null;
+      allow create, update: if true;
+    }
+
+    // Analytics: public create (anonymous tracking), auth-only read
+    match /analytics/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+    }
+
   }
 }

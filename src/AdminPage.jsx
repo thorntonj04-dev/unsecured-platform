@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   signIn, signOut, onAuthChange,
   fetchAllEssays, saveEssay, deleteEssay,
-  fetchAdminCollection,
+  fetchAdminCollection, fetchAnalytics,
 } from "./firebase";
 
 // ─── TOKENS (mirrors App.jsx) ─────────────────────────────────────────────────
@@ -285,9 +285,117 @@ function Field({ label, note, required, children }) {
   );
 }
 
+// ─── ANALYTICS PROCESSOR ─────────────────────────────────────────────────────
+function processAnalytics(events) {
+  const now = new Date();
+  const cutoff30 = new Date(now); cutoff30.setDate(cutoff30.getDate() - 30);
+
+  const valid = events.filter(e => e.timestamp?.toDate);
+  const views = valid.filter(e => e.type === "page_view" || e.type === "essay_view");
+  const recent30 = views.filter(e => e.timestamp.toDate() >= cutoff30);
+
+  const uniqueSessions = new Set(views.map(e => e.sessionId).filter(Boolean)).size;
+
+  // Top essays
+  const essayCounts = {};
+  valid.filter(e => e.type === "essay_view").forEach(e => {
+    if (e.essayTitle) essayCounts[e.essayTitle] = (essayCounts[e.essayTitle] || 0) + 1;
+  });
+  const topEssays = Object.entries(essayCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([title, count]) => ({ title, count }));
+
+  // Traffic sources
+  const refCounts = {};
+  views.forEach(e => {
+    const r = e.referrer || "Direct";
+    refCounts[r] = (refCounts[r] || 0) + 1;
+  });
+  const trafficSources = Object.entries(refCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([source, count]) => ({ source, count }));
+
+  // Device split
+  const devices = { mobile: 0, desktop: 0 };
+  views.forEach(e => {
+    if (e.device === "mobile") devices.mobile++;
+    else devices.desktop++;
+  });
+
+  // Share clicks
+  const shareCounts = {};
+  valid.filter(e => e.type === "share_click").forEach(e => {
+    if (e.platform) shareCounts[e.platform] = (shareCounts[e.platform] || 0) + 1;
+  });
+  const shareClicks = Object.entries(shareCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([platform, count]) => ({ platform, count }));
+
+  // Daily views — last 30 days
+  const days = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    days.push({ label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), dateStr: d.toDateString(), count: 0 });
+  }
+  recent30.forEach(e => {
+    const ds = e.timestamp.toDate().toDateString();
+    const day = days.find(d => d.dateStr === ds);
+    if (day) day.count++;
+  });
+
+  return {
+    total: views.length,
+    recent30: recent30.length,
+    uniqueSessions,
+    topEssay: topEssays[0]?.title || "—",
+    topEssays,
+    trafficSources,
+    devices,
+    shareClicks,
+    dailyViews: days,
+    recentEvents: valid.slice(0, 40),
+  };
+}
+
+// ─── ANALYTICS COMPONENTS ─────────────────────────────────────────────────────
+function StatCard({ label, value, sub }) {
+  return (
+    <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 28px", flex: 1, minWidth: 0 }}>
+      <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: C.g400, marginBottom: 10 }}>{label}</p>
+      <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 36, fontWeight: 900, color: C.navy, lineHeight: 1, marginBottom: sub ? 6 : 0 }}>{value}</p>
+      {sub && <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 12, color: C.g400, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{sub}</p>}
+    </div>
+  );
+}
+
+function HBar({ label, count, max, color = C.gold }) {
+  const pct = max > 0 ? Math.max(2, Math.round((count / max) * 100)) : 0;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+      <div style={{ width: 110, fontFamily: "'Source Sans 3',sans-serif", fontSize: 12, color: C.g600, textAlign: "right", flexShrink: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</div>
+      <div style={{ flex: 1, background: C.g200, height: 12, position: "relative" }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: color, transition: "width .4s ease" }} />
+      </div>
+      <div style={{ width: 28, fontFamily: "'Source Sans 3',sans-serif", fontSize: 12, color: C.g600, textAlign: "right", flexShrink: 0 }}>{count}</div>
+    </div>
+  );
+}
+
+function SectionTitle({ children }) {
+  return (
+    <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.gold, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
+      {children}
+    </p>
+  );
+}
+
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 function Dashboard({ onSignOut }) {
-  const [activeTab, setActiveTab] = useState("essays"); // 'essays' | 'audits' | 'waitlist' | 'inquiries' | 'subscribers'
+  const [activeTab, setActiveTab] = useState("analytics"); // default to analytics
   const [essays, setEssays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
@@ -303,13 +411,34 @@ function Dashboard({ onSignOut }) {
   const [subscribers, setSubscribers] = useState([]);
   const [collectionLoading, setCollectionLoading] = useState(false);
 
-  useEffect(() => { loadEssays(); }, []);
+  // Analytics state
+  const [analyticsRaw, setAnalyticsRaw] = useState([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsLoaded, setAnalyticsLoaded] = useState(false);
+
+  useEffect(() => {
+    loadEssays();
+    loadAnalytics(); // load analytics on mount
+  }, []);
 
   async function loadEssays() {
     setLoading(true);
     const data = await fetchAllEssays();
     setEssays(data);
     setLoading(false);
+  }
+
+  async function loadAnalytics() {
+    setAnalyticsLoading(true);
+    try {
+      const data = await fetchAnalytics();
+      setAnalyticsRaw(data);
+      setAnalyticsLoaded(true);
+    } catch (err) {
+      showToast(`Analytics failed: ${err.message}`);
+    } finally {
+      setAnalyticsLoading(false);
+    }
   }
 
   async function loadCollection(name) {
@@ -335,6 +464,8 @@ function Dashboard({ onSignOut }) {
     if (tab === "inquiries" && inquiries.length === 0) loadCollection("inquiries");
     if (tab === "subscribers" && subscribers.length === 0) loadCollection("subscribers");
   }
+
+  const analytics = analyticsLoaded ? processAnalytics(analyticsRaw) : null;
 
   function showToast(msg) {
     setToast(msg);
@@ -421,7 +552,7 @@ function Dashboard({ onSignOut }) {
           </div>
           {/* Tab bar */}
           <div style={{ display: "flex", gap: 0, overflowX: "auto", scrollbarWidth: "none" }}>
-            {[["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
+            {[["Analytics","analytics"],["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
               <button key={t} onClick={() => handleTabChange(t)} style={tabStyle(t)}>{label}</button>
             ))}
           </div>
@@ -463,6 +594,165 @@ function Dashboard({ onSignOut }) {
 
       {/* ── Main content ── */}
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 32px" }}>
+
+        {/* ── ANALYTICS TAB ── */}
+        {activeTab === "analytics" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+              <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: C.navy }}>
+                Who's Been Watching
+              </h2>
+              <button onClick={loadAnalytics} disabled={analyticsLoading} style={{ ...outlineBtn, padding: "8px 16px", fontSize: 11, opacity: analyticsLoading ? 0.5 : 1 }}>
+                {analyticsLoading ? "Loading…" : "Refresh"}
+              </button>
+            </div>
+
+            {analyticsLoading && !analyticsLoaded && (
+              <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 14, color: C.g600 }}>Loading analytics…</p>
+            )}
+
+            {analytics && (
+              <>
+                {/* ── STAT CARDS ── */}
+                <div style={{ display: "flex", gap: 12, marginBottom: 28, flexWrap: "wrap" }}>
+                  <StatCard label="Total Views" value={analytics.total.toLocaleString()} />
+                  <StatCard label="Last 30 Days" value={analytics.recent30.toLocaleString()} />
+                  <StatCard label="Unique Sessions" value={analytics.uniqueSessions.toLocaleString()} />
+                  <StatCard label="Most Read Essay" value={analytics.topEssays[0]?.count ?? "—"} sub={analytics.topEssay} />
+                </div>
+
+                {/* ── DAILY BAR CHART ── */}
+                <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 28px 20px", marginBottom: 20 }}>
+                  <SectionTitle>Views — Last 30 Days</SectionTitle>
+                  {analytics.dailyViews.every(d => d.count === 0) ? (
+                    <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400, padding: "20px 0" }}>No data yet. Views will appear here once visitors arrive.</p>
+                  ) : (
+                    <>
+                      <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 80, marginBottom: 6 }}>
+                        {(() => {
+                          const max = Math.max(...analytics.dailyViews.map(d => d.count), 1);
+                          return analytics.dailyViews.map((d, i) => (
+                            <div key={i} title={`${d.label}: ${d.count} view${d.count !== 1 ? "s" : ""}`}
+                              style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", cursor: "default" }}>
+                              <div style={{ background: d.count > 0 ? C.gold : C.g200, height: `${Math.max(2, (d.count / max) * 100)}%`, transition: "height .3s ease", minHeight: d.count > 0 ? 4 : 2 }} />
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, color: C.g400 }}>{analytics.dailyViews[0]?.label}</span>
+                        <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, color: C.g400 }}>{analytics.dailyViews[analytics.dailyViews.length - 1]?.label}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* ── ESSAYS + SOURCES ── */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                  {/* Top essays */}
+                  <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 24px" }}>
+                    <SectionTitle>Top Essays</SectionTitle>
+                    {analytics.topEssays.length === 0 ? (
+                      <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>No essay views yet.</p>
+                    ) : (
+                      analytics.topEssays.map((e, i) => (
+                        <HBar key={i} label={e.title.length > 28 ? e.title.slice(0, 25) + "…" : e.title} count={e.count} max={analytics.topEssays[0].count} />
+                      ))
+                    )}
+                  </div>
+
+                  {/* Traffic sources */}
+                  <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 24px" }}>
+                    <SectionTitle>Traffic Sources</SectionTitle>
+                    {analytics.trafficSources.length === 0 ? (
+                      <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>No data yet.</p>
+                    ) : (
+                      analytics.trafficSources.map((s, i) => (
+                        <HBar key={i} label={s.source} count={s.count} max={analytics.trafficSources[0].count} color={C.navyLight} />
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* ── DEVICE + SHARES ── */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                  {/* Device split */}
+                  <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 24px" }}>
+                    <SectionTitle>Device Split</SectionTitle>
+                    {analytics.total === 0 ? (
+                      <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>No data yet.</p>
+                    ) : (() => {
+                      const total = analytics.devices.mobile + analytics.devices.desktop || 1;
+                      const mobPct = Math.round((analytics.devices.mobile / total) * 100);
+                      const desPct = 100 - mobPct;
+                      return (
+                        <>
+                          <div style={{ display: "flex", height: 16, marginBottom: 16, gap: 2 }}>
+                            <div style={{ width: `${desPct}%`, background: C.navy, transition: "width .4s" }} title={`Desktop ${desPct}%`} />
+                            <div style={{ width: `${mobPct}%`, background: C.gold, transition: "width .4s" }} title={`Mobile ${mobPct}%`} />
+                          </div>
+                          {[["Desktop", analytics.devices.desktop, desPct, C.navy], ["Mobile", analytics.devices.mobile, mobPct, C.gold]].map(([label, count, pct, color]) => (
+                            <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                              <div style={{ width: 10, height: 10, background: color, flexShrink: 0 }} />
+                              <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g800, flex: 1 }}>{label}</span>
+                              <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>{count} ({pct}%)</span>
+                            </div>
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Share clicks */}
+                  <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 24px" }}>
+                    <SectionTitle>Share Clicks</SectionTitle>
+                    {analytics.shareClicks.length === 0 ? (
+                      <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>No shares yet.</p>
+                    ) : (
+                      analytics.shareClicks.map((s, i) => (
+                        <HBar key={i} label={s.platform} count={s.count} max={analytics.shareClicks[0].count} color="#5f7050" />
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* ── RECENT ACTIVITY ── */}
+                <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "24px 24px" }}>
+                  <SectionTitle>Recent Activity</SectionTitle>
+                  {analytics.recentEvents.length === 0 ? (
+                    <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400 }}>No activity yet.</p>
+                  ) : (
+                    <div style={{ maxHeight: 360, overflowY: "auto" }}>
+                      {analytics.recentEvents.map((e, i) => {
+                        const ts = e.timestamp?.toDate?.();
+                        const timeStr = ts ? ts.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—";
+                        const isShare = e.type === "share_click";
+                        const isEssay = e.type === "essay_view";
+                        return (
+                          <div key={e.id || i} style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "10px 0", borderBottom: `1px solid ${C.g200}` }}>
+                            <div style={{ width: 8, height: 8, borderRadius: "50%", marginTop: 5, flexShrink: 0,
+                              background: isShare ? "#5f7050" : isEssay ? C.gold : C.navyLight }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g800, lineHeight: 1.4, margin: 0 }}>
+                                {isShare ? `Shared on ${e.platform}` : isEssay ? "Essay view" : "Page view"}
+                                {(isShare || isEssay) && e.essayTitle && (
+                                  <span style={{ color: C.g400 }}> · "{e.essayTitle.length > 40 ? e.essayTitle.slice(0, 38) + "…" : e.essayTitle}"</span>
+                                )}
+                              </p>
+                              <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: C.g400, margin: "2px 0 0", lineHeight: 1.3 }}>
+                                {timeStr}{e.referrer && e.referrer !== "Direct" ? ` · via ${e.referrer}` : ""}{e.device ? ` · ${e.device}` : ""}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* ── ESSAYS TAB ── */}
         {activeTab === "essays" && (

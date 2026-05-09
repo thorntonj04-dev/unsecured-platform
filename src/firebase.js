@@ -14,7 +14,7 @@ import { initializeApp, getApps } from "firebase/app";
 import {
   getFirestore, collection, getDocs, doc,
   setDoc, deleteDoc, query, orderBy, where,
-  addDoc, serverTimestamp,
+  addDoc, serverTimestamp, limit,
 } from "firebase/firestore";
 import {
   getAuth, signInWithEmailAndPassword,
@@ -188,6 +188,83 @@ export async function fetchAdminCollection(name) {
   const q = query(collection(db, name), orderBy("timestamp", "desc"));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// ── ANALYTICS HELPERS ─────────────────────────────────────────────────────────
+
+export function parseReferrer() {
+  try {
+    const ref = document.referrer;
+    if (!ref) return "Direct";
+    const host = new URL(ref).hostname.replace(/^www\./, "");
+    if (host.includes("google")) return "Google";
+    if (host.includes("linkedin")) return "LinkedIn";
+    if (host.includes("facebook") || host.includes("fb.com")) return "Facebook";
+    if (host.includes("twitter") || host.includes("x.com")) return "X";
+    if (host.includes("bing")) return "Bing";
+    if (host.includes("reddit")) return "Reddit";
+    if (host.includes("instagram")) return "Instagram";
+    if (host.includes("tiktok")) return "TikTok";
+    return host || "Direct";
+  } catch { return "Direct"; }
+}
+
+export function getSessionId() {
+  try {
+    let id = sessionStorage.getItem("_sid");
+    if (!id) {
+      id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem("_sid", id);
+    }
+    return id;
+  } catch { return "unknown"; }
+}
+
+// Captures the referrer once per session (so navigating essays doesn't overwrite it)
+export function getSessionReferrer() {
+  try {
+    let ref = sessionStorage.getItem("_ref");
+    if (ref === null) {
+      ref = parseReferrer();
+      sessionStorage.setItem("_ref", ref);
+    }
+    return ref;
+  } catch { return "Direct"; }
+}
+
+export function getDevice() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? "mobile" : "desktop";
+}
+
+// ── TRACK EVENT ───────────────────────────────────────────────────────────────
+// Fire-and-forget — never throws, never blocks UI.
+export async function trackEvent(data) {
+  const db = getDB();
+  if (!db) return;
+  try {
+    await addDoc(collection(db, "analytics"), {
+      ...data,
+      timestamp: serverTimestamp(),
+    });
+  } catch { /* intentionally silent */ }
+}
+
+// ── FETCH ANALYTICS (admin only) ──────────────────────────────────────────────
+export async function fetchAnalytics() {
+  const db = getDB();
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, "analytics"),
+      orderBy("timestamp", "desc"),
+      limit(2000)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.warn("fetchAnalytics failed:", err.message);
+    return [];
+  }
 }
 
 export { LOCAL_ESSAYS };

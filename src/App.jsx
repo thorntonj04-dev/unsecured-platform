@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { LOCAL_ESSAYS } from "./essays";
-import { fetchEssays, submitInquiry, subscribeNewsletter } from "./firebase";
+import { fetchEssays, submitInquiry, subscribeNewsletter, trackEvent, getSessionId, getDevice, getSessionReferrer } from "./firebase";
 import SystemAuditPage from "./SystemAuditPage";
 import CohortPage from "./CohortPage";
 
@@ -263,7 +263,15 @@ export default function App() {
 
   useEffect(() => {
     fetchEssays().then(data => { if (data && data.length) setEssays(data); });
-  }, []);
+    // Track initial page load once per session
+    trackEvent({
+      type: "page_view",
+      page: window.location.pathname,
+      sessionId: getSessionId(),
+      referrer: getSessionReferrer(),
+      device: getDevice(),
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Deep link: /essay/{id}
   useEffect(() => {
@@ -279,6 +287,18 @@ export default function App() {
   const openEssay = (e) => {
     setEssay(e);
     window.history.replaceState(null, "", e ? `/essay/${e.id}` : "/");
+    if (e) {
+      trackEvent({
+        type: "essay_view",
+        page: `/essay/${e.id}`,
+        sessionId: getSessionId(),
+        referrer: getSessionReferrer(),
+        device: getDevice(),
+        essayId: e.id,
+        essayTitle: e.title,
+        essayTheme: e.theme,
+      });
+    }
   };
 
   useEffect(() => {
@@ -921,6 +941,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
     navigator.clipboard.writeText(shareUrl()).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
+      trackEvent({ type: "share_click", platform: "Copy Link", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
     });
   }
 
@@ -930,6 +951,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
       `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl())}`,
       "_blank", "noopener,noreferrer"
     );
+    trackEvent({ type: "share_click", platform: "X", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
   }
 
   function shareFacebook() {
@@ -937,6 +959,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl())}`,
       "_blank", "noopener,noreferrer"
     );
+    trackEvent({ type: "share_click", platform: "Facebook", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
   }
 
   const themeHashtags = {
@@ -962,6 +985,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
       hashtags,
     ].join("\n");
     setLinkedInDraft(draft);
+    trackEvent({ type: "share_click", platform: "LinkedIn", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
   }
 
   function postToLinkedIn() {
