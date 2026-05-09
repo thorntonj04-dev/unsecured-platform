@@ -4,10 +4,10 @@ import { LOCAL_ESSAYS } from '../../src/essays.js';
 export const config = { runtime: 'edge' };
 
 const TC = {
-  Pressure: '#8b6e52',
-  Urgency: '#4e6878',
-  'Internal Rules': '#5f7050',
-  Reconfiguration: '#7a6b52',
+  Pressure:        { hex: '#8b6e52', rgba: 'rgba(139,110,82,0.55)' },
+  Urgency:         { hex: '#4e6878', rgba: 'rgba(78,104,120,0.55)' },
+  'Internal Rules':{ hex: '#5f7050', rgba: 'rgba(95,112,80,0.55)' },
+  Reconfiguration: { hex: '#7a6b52', rgba: 'rgba(122,107,82,0.55)' },
 };
 
 function h(type, props, ...children) {
@@ -27,7 +27,7 @@ export default async function handler(req) {
     return new Response('Not found', { status: 404 });
   }
 
-  const themeColor = TC[essay.theme] || '#8b6e52';
+  const theme = TC[essay.theme] || TC.Pressure;
   const titleSize = essay.title.length > 44 ? '50px' : '62px';
   const subhead = essay.subhead.length > 82
     ? essay.subhead.slice(0, 79) + '…'
@@ -45,10 +45,11 @@ export default async function handler(req) {
       // Gold left accent bar
       h('div', {
         style: {
-          width: '8px',
+          display: 'flex',
+          width: 8,
           height: '100%',
           background: '#b8943f',
-          flexShrink: '0',
+          flexShrink: 0,
         },
       }),
       // Main content column
@@ -56,36 +57,42 @@ export default async function handler(req) {
         style: {
           display: 'flex',
           flexDirection: 'column',
-          flex: '1',
+          flexGrow: 1,
           padding: '64px 80px 56px 72px',
           justifyContent: 'space-between',
         },
       },
         // Top: theme badge + title
         h('div', {
-          style: { display: 'flex', flexDirection: 'column', gap: '24px' },
+          style: { display: 'flex', flexDirection: 'column', gap: 24 },
         },
+          // Theme badge — alignSelf instead of width:fit-content (not supported in Satori)
           h('div', {
             style: {
               display: 'flex',
-              width: 'fit-content',
+              alignSelf: 'flex-start',
               padding: '6px 16px',
-              border: `1px solid ${themeColor}90`,
-              color: themeColor,
-              fontSize: '13px',
-              fontWeight: '700',
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.hex,
+              background: theme.rgba,
+              color: theme.hex,
+              fontSize: 13,
+              fontWeight: 700,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
             },
           }, essay.theme),
+          // Title
           h('div', {
             style: {
+              display: 'flex',
               fontSize: titleSize,
-              fontWeight: '900',
+              fontWeight: 900,
               color: '#f4efe6',
-              lineHeight: '1.08',
+              lineHeight: 1.08,
               letterSpacing: '-0.02em',
-              maxWidth: '960px',
+              maxWidth: 960,
             },
           }, essay.title),
         ),
@@ -99,11 +106,12 @@ export default async function handler(req) {
         },
           h('div', {
             style: {
-              fontSize: '21px',
+              display: 'flex',
+              fontSize: 21,
               color: 'rgba(244,239,230,0.48)',
               fontStyle: 'italic',
-              lineHeight: '1.5',
-              maxWidth: '660px',
+              lineHeight: 1.5,
+              maxWidth: 620,
             },
           }, subhead),
           h('div', {
@@ -111,22 +119,24 @@ export default async function handler(req) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-end',
-              gap: '6px',
+              gap: 6,
             },
           },
             h('div', {
               style: {
-                fontSize: '15px',
+                display: 'flex',
+                fontSize: 15,
                 color: '#b8943f',
-                fontWeight: '600',
+                fontWeight: 600,
                 letterSpacing: '0.08em',
               },
             }, 'John Thornton'),
             h('div', {
               style: {
-                fontSize: '19px',
+                display: 'flex',
+                fontSize: 19,
                 color: 'rgba(244,239,230,0.16)',
-                fontWeight: '900',
+                fontWeight: 900,
                 letterSpacing: '0.3em',
               },
             }, 'UNSECURED'),
