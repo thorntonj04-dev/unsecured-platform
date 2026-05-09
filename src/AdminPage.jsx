@@ -393,6 +393,192 @@ function SectionTitle({ children }) {
   );
 }
 
+// ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
+function CardNoteItem({ essay, note, onChange }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const hasNote = note.trim().length > 0;
+
+  return (
+    <div style={{
+      background: "white",
+      border: `1.5px solid ${hasNote ? C.gold : C.g200}`,
+      overflow: "hidden",
+      transition: "border-color .2s",
+    }}>
+      {/* OG card preview */}
+      <div style={{ position: "relative", background: "#0d1720", aspectRatio: "1200/630" }}>
+        {!imgError && (
+          <img
+            src={`/api/og/${essay.id}`}
+            alt={`Card: ${essay.title}`}
+            loading="lazy"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgError(true)}
+            style={{ width: "100%", display: "block", opacity: imgLoaded ? 1 : 0, transition: "opacity .3s" }}
+          />
+        )}
+        {!imgLoaded && !imgError && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.25)", letterSpacing: ".12em", textTransform: "uppercase" }}>Loading…</span>
+          </div>
+        )}
+        {imgError && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.25)", letterSpacing: ".12em" }}>Image unavailable</span>
+          </div>
+        )}
+      </div>
+
+      {/* Essay meta */}
+      <div style={{ padding: "14px 16px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: C.g400, fontWeight: 700 }}>#{essay.id}</span>
+          <span style={{
+            fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700,
+            letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 8px",
+            background: `${TC[essay.theme]}15`, color: TC[essay.theme], border: `1px solid ${TC[essay.theme]}30`,
+          }}>{essay.theme}</span>
+          <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, marginLeft: "auto", color: essay.published !== false ? C.green : C.g400 }}>
+            {essay.published !== false ? "Live" : "Draft"}
+          </span>
+        </div>
+        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 14, fontWeight: 700, color: C.navy, margin: "0 0 12px", lineHeight: 1.35 }}>{essay.title}</p>
+      </div>
+
+      {/* Notes */}
+      <div style={{ padding: "0 16px 14px" }}>
+        <textarea
+          value={note}
+          onChange={e => onChange(e.target.value)}
+          placeholder="Notes for this card — what needs to change?"
+          rows={3}
+          style={{
+            width: "100%", boxSizing: "border-box",
+            fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, lineHeight: 1.65, color: C.g800,
+            border: `1px solid ${hasNote ? C.gold : C.g200}`,
+            padding: "10px 12px", resize: "vertical", outline: "none",
+            background: hasNote ? "#fffdf7" : C.g100, transition: "border-color .2s, background .2s",
+          }}
+        />
+        {hasNote && (
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, color: C.gold, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", margin: "4px 0 0" }}>
+            Saved · {note.trim().length} chars
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CardReviewTab({ essays }) {
+  const [notes, setNotes] = useState({});
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const loaded = {};
+    essays.forEach(e => {
+      const saved = localStorage.getItem(`unsecured_card_note_${e.id}`);
+      if (saved) loaded[e.id] = saved;
+    });
+    setNotes(loaded);
+  }, [essays.length]);
+
+  function updateNote(id, text) {
+    setNotes(prev => ({ ...prev, [id]: text }));
+    if (text.trim()) {
+      localStorage.setItem(`unsecured_card_note_${id}`, text);
+    } else {
+      localStorage.removeItem(`unsecured_card_note_${id}`);
+    }
+  }
+
+  function copyAllNotes() {
+    const flagged = essays.filter(e => notes[e.id]?.trim());
+    if (flagged.length === 0) return;
+    const date = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const lines = [
+      `CARD REVIEW NOTES — ${date}`,
+      "",
+      ...flagged.map(e =>
+        `Essay ${e.id} — ${e.title} [${e.theme}]\n→ ${notes[e.id].trim()}`
+      ),
+    ];
+    navigator.clipboard.writeText(lines.join("\n\n")).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
+
+  const noteCount = Object.values(notes).filter(n => n?.trim()).length;
+  const published = essays.filter(e => e.published !== false);
+  const drafts = essays.filter(e => e.published === false);
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: C.navy, marginBottom: 4 }}>
+            OG Card Review
+          </h2>
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400, margin: 0 }}>
+            {essays.length} cards · {noteCount > 0 ? `${noteCount} flagged` : "no notes yet"} · Notes saved in your browser
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
+          {noteCount > 0 && (
+            <button onClick={copyAllNotes} style={{ ...btnStyle, padding: "10px 20px" }}>
+              {copied ? "Copied!" : `Copy ${noteCount} Note${noteCount !== 1 ? "s" : ""} →`}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {essays.length === 0 && (
+        <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 14, color: C.g400, padding: "40px 0", textAlign: "center" }}>
+          No essays loaded yet.
+        </p>
+      )}
+
+      {published.length > 0 && (
+        <>
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.g400, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
+            Published ({published.length})
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(480px, 1fr))", gap: 20, marginBottom: 32 }}>
+            {published.map(essay => (
+              <CardNoteItem
+                key={essay.id}
+                essay={essay}
+                note={notes[essay.id] || ""}
+                onChange={text => updateNote(essay.id, text)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {drafts.length > 0 && (
+        <>
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.g400, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
+            Drafts ({drafts.length})
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(480px, 1fr))", gap: 20 }}>
+            {drafts.map(essay => (
+              <CardNoteItem
+                key={essay.id}
+                essay={essay}
+                note={notes[essay.id] || ""}
+                onChange={text => updateNote(essay.id, text)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 function Dashboard({ onSignOut }) {
   const [activeTab, setActiveTab] = useState("analytics"); // default to analytics
@@ -552,7 +738,7 @@ function Dashboard({ onSignOut }) {
           </div>
           {/* Tab bar */}
           <div style={{ display: "flex", gap: 0, overflowX: "auto", scrollbarWidth: "none" }}>
-            {[["Analytics","analytics"],["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
+            {[["Analytics","analytics"],["Cards","cards"],["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
               <button key={t} onClick={() => handleTabChange(t)} style={tabStyle(t)}>{label}</button>
             ))}
           </div>
@@ -752,6 +938,11 @@ function Dashboard({ onSignOut }) {
               </>
             )}
           </div>
+        )}
+
+        {/* ── CARDS TAB ── */}
+        {activeTab === "cards" && (
+          <CardReviewTab essays={essays} />
         )}
 
         {/* ── ESSAYS TAB ── */}
