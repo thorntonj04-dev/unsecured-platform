@@ -18,12 +18,19 @@ const C = {
 
 const THEMES = ["Pressure", "Urgency", "Internal Rules", "Reconfiguration"];
 
+// Edge Functions don't run under Vite dev server — point at production origin locally.
+const OG_ORIGIN = (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"))
+  ? "https://unsecured.info"
+  : "";
+
 const BLANK_ESSAY = {
   id: "",
   theme: "Pressure",
   readTime: "6 min",
   title: "",
   hook: "",
+  pullQuote: "",
   subhead: "",
   body: [],
   bookTie: "",
@@ -229,6 +236,12 @@ function EssayForm({ initial, allEssays, onSave, onCancel }) {
             placeholder="We've been taught to measure strength by how much we can carry. That measurement is wrong." />
         </Field>
 
+        <Field label="Pull Quote" note="Drives the OG share card — one punchy sentence (falls back to hook if empty)">
+          <textarea style={{ ...inputDarkStyle, ...textareaStyle, height: 72 }}
+            value={form.pullQuote || ""} onChange={e => set("pullQuote", e.target.value)}
+            placeholder="Pressure is a signal, not a test. Tests are meant to be passed. Signals are meant to be read." />
+        </Field>
+
         <Field label="Subhead" note="One sentence subtitle shown under the title">
           <input style={inputDarkStyle} value={form.subhead}
             onChange={e => set("subhead", e.target.value)}
@@ -259,13 +272,19 @@ function EssayForm({ initial, allEssays, onSave, onCancel }) {
           <p style={{ fontFamily: "sans-serif", fontSize: 13, color: C.redLight, marginBottom: 16 }}>{error}</p>
         )}
 
-        <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+        <div style={{ display: "flex", gap: 12, marginTop: 8, alignItems: "center" }}>
           <button type="submit" disabled={saving} style={{
             ...btnStyle, opacity: saving ? 0.6 : 1, cursor: saving ? "not-allowed" : "pointer",
           }}>
             {saving ? "Saving…" : isNew ? "Publish Essay" : "Save Changes"}
           </button>
           <button type="button" onClick={onCancel} style={outlineBtn}>Cancel</button>
+          {!isNew && (
+            <a href={`${OG_ORIGIN}/api/og/${initial.id}`} target="_blank" rel="noopener noreferrer"
+              style={{ marginLeft: "auto", fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: C.gold, textDecoration: "none" }}>
+              View Card →
+            </a>
+          )}
         </div>
       </form>
     </div>
@@ -393,14 +412,173 @@ function SectionTitle({ children }) {
   );
 }
 
-// ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
-// Edge Functions don't run under Vite's dev server, so resolve images
-// against the production origin when running locally.
-const OG_ORIGIN = (typeof window !== "undefined" &&
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"))
-  ? "https://unsecured.info"
-  : "";
+// ─── CUSTOM CARD GENERATOR ───────────────────────────────────────────────────
+function CustomCardTab() {
+  const [quote, setQuote]       = useState("");
+  const [theme, setTheme]       = useState("Pressure");
+  const [label, setLabel]       = useState("");
+  const [shareLink, setShareLink] = useState("https://unsecured.info");
+  const [previewSrc, setPreviewSrc] = useState(null);
+  const [copied, setCopied]     = useState(false);
+  const [shareDraft, setShareDraft] = useState("");
 
+  const themeHashtags = {
+    Pressure:         "#Leadership #Burnout #WorkplaceCulture #HighPerformance #Resilience",
+    Urgency:          "#Urgency #Productivity #WorkplaceCulture #Leadership #MentalHealth",
+    "Internal Rules": "#SelfAwareness #PersonalGrowth #Leadership #WorkplaceCulture #MindsetShift",
+    Reconfiguration:  "#PersonalDevelopment #Leadership #WorkplaceCulture #Growth #Reconfiguration",
+  };
+
+  function buildCardUrl() {
+    const params = new URLSearchParams({ quote, theme });
+    if (label.trim()) params.set("label", label.trim());
+    return `${OG_ORIGIN}/api/og/custom?${params.toString()}`;
+  }
+
+  function generate() {
+    if (!quote.trim()) return;
+    const hashtags = themeHashtags[theme] || "#Leadership #WorkplaceCulture";
+    const draft = [
+      `"${quote.trim()}"`,
+      "",
+      `— John Thornton`,
+      label.trim() ? `\nFrom: ${label.trim()}` : "",
+      "",
+      shareLink !== "https://unsecured.info" ? shareLink : "https://unsecured.info",
+      "",
+      hashtags,
+    ].filter(l => l !== undefined).join("\n");
+    setShareDraft(draft);
+    setPreviewSrc(buildCardUrl());
+  }
+
+  function postToLinkedIn() {
+    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareDraft)}`, "_blank", "noopener,noreferrer");
+  }
+
+  function postToX() {
+    const xText = `"${quote.trim()}" — John Thornton`;
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(xText)}&url=${encodeURIComponent(shareLink)}`, "_blank", "noopener,noreferrer");
+  }
+
+  function copyText() {
+    navigator.clipboard.writeText(shareDraft).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
+
+  const canGenerate = quote.trim().length > 0;
+
+  return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: C.navy, marginBottom: 4 }}>
+          Custom Card Generator
+        </h2>
+        <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 13, color: C.g400, margin: 0 }}>
+          Drop any line from the book or anywhere — generate a branded 1200×630 card and share it directly.
+        </p>
+      </div>
+
+      {/* Form */}
+      <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 32px", marginBottom: 20 }}>
+        <div style={{ marginBottom: 16 }}>
+          <label style={labelDarkStyle}>Quote <span style={{ fontWeight: 400, color: C.g400 }}>— the line you want to share</span></label>
+          <textarea
+            value={quote}
+            onChange={e => setQuote(e.target.value)}
+            rows={4}
+            placeholder="Enter any line from the book, a talk, or wherever…"
+            style={{ ...inputDarkStyle, ...textareaStyle, fontSize: 15, fontFamily: "Georgia,serif", lineHeight: 1.7 }}
+          />
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: quote.length > 200 ? C.red : C.g400, marginTop: 4, margin: "4px 0 0" }}>
+            {quote.length}/250 chars {quote.length > 200 ? "— shorter quotes render larger and more shareable" : ""}
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px", marginBottom: 16 }}>
+          <div>
+            <label style={labelDarkStyle}>Theme</label>
+            <select value={theme} onChange={e => setTheme(e.target.value)} style={{ ...inputDarkStyle, cursor: "pointer" }}>
+              {THEMES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelDarkStyle}>Label <span style={{ fontWeight: 400, color: C.g400 }}>— optional source (e.g. "From: Unsecured, Ch. 4")</span></label>
+            <input
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              placeholder="From: Unsecured"
+              style={inputDarkStyle}
+            />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label style={labelDarkStyle}>Link to include in post</label>
+            <input
+              value={shareLink}
+              onChange={e => setShareLink(e.target.value)}
+              style={inputDarkStyle}
+            />
+          </div>
+        </div>
+
+        <button onClick={generate} disabled={!canGenerate}
+          style={{ ...btnStyle, opacity: canGenerate ? 1 : 0.4, cursor: canGenerate ? "pointer" : "not-allowed" }}>
+          Generate Preview →
+        </button>
+      </div>
+
+      {/* Preview + share */}
+      {previewSrc && (
+        <div style={{ background: "white", border: `1px solid ${C.g200}`, padding: "28px 32px" }}>
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.g400, marginBottom: 16, paddingBottom: 8, borderBottom: `1px solid ${C.g200}` }}>
+            Preview
+          </p>
+          <img
+            key={previewSrc}
+            src={previewSrc}
+            alt="Custom card preview"
+            style={{ width: "100%", display: "block", marginBottom: 24, border: `1px solid ${C.g200}` }}
+          />
+
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: C.g400, marginBottom: 12 }}>
+            Post draft
+          </p>
+          <textarea
+            value={shareDraft}
+            onChange={e => setShareDraft(e.target.value)}
+            rows={7}
+            style={{ ...inputDarkStyle, ...textareaStyle, marginBottom: 16 }}
+          />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10 }}>
+            <button onClick={postToLinkedIn} className="btn-d" style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "11px 0", background: C.navy, color: "white", border: "none", cursor: "pointer" }}>
+              Post to LinkedIn
+            </button>
+            <button onClick={postToX}
+              style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "11px 0", background: "#0f1419", color: "white", border: "none", cursor: "pointer" }}>
+              Post to X
+            </button>
+            <a href={previewSrc} download="unsecured-card.png" target="_blank" rel="noopener noreferrer"
+              style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "11px 0", background: C.gold, color: "white", border: "none", cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              Download Card
+            </a>
+            <button onClick={copyText}
+              style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "11px 0", background: "transparent", color: C.g600, border: `1px solid ${C.g200}`, cursor: "pointer" }}>
+              {copied ? "Copied!" : "Copy Text"}
+            </button>
+          </div>
+          <p style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: C.g400, marginTop: 12, lineHeight: 1.6 }}>
+            Edit the quote or theme above and click Generate again to refresh the card.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
 function CardNoteItem({ essay, note, onChange }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -750,7 +928,7 @@ function Dashboard({ onSignOut }) {
           </div>
           {/* Tab bar */}
           <div style={{ display: "flex", gap: 0, overflowX: "auto", scrollbarWidth: "none" }}>
-            {[["Analytics","analytics"],["Cards","cards"],["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
+            {[["Analytics","analytics"],["Cards","cards"],["Custom","custom"],["Essays","essays"],["Audits","audits"],["Waitlist","waitlist"],["Inquiries","inquiries"],["Subscribers","subscribers"]].map(([label, t]) => (
               <button key={t} onClick={() => handleTabChange(t)} style={tabStyle(t)}>{label}</button>
             ))}
           </div>
@@ -955,6 +1133,11 @@ function Dashboard({ onSignOut }) {
         {/* ── CARDS TAB ── */}
         {activeTab === "cards" && (
           <CardReviewTab essays={essays} />
+        )}
+
+        {/* ── CUSTOM CARD TAB ── */}
+        {activeTab === "custom" && (
+          <CustomCardTab />
         )}
 
         {/* ── ESSAYS TAB ── */}

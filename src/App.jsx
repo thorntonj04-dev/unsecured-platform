@@ -18,6 +18,11 @@ const TC = {
   "Internal Rules": "#5f7050", Reconfiguration: "#7a6b52",
 };
 
+// Edge Functions don't run under Vite dev server — point at production origin locally.
+const OG_ORIGIN = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ? "https://unsecured.info"
+  : "";
+
 const THEMES = ["All","Pressure","Urgency","Internal Rules","Reconfiguration"];
 
 const MARQUEE_ITEMS = [
@@ -1012,7 +1017,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
             </div>
             {/* OG card preview */}
             <img
-              src={`/api/og/${essay.id}`}
+              src={`${OG_ORIGIN}/api/og/${essay.id}`}
               alt="Essay preview card"
               style={{ width:"100%",display:"block",marginBottom:20,border:`1px solid ${C.g200}` }}
             />
