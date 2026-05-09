@@ -63,6 +63,7 @@ function normalizeEssay(data) {
     readTime: data.readTime || "",
     title: data.title || "",
     hook: data.hook || "",
+    pullQuote: data.pullQuote || "",
     subhead: data.subhead || "",
     body: Array.isArray(data.body) ? data.body : [],
     bookTie: data.bookTie || "",

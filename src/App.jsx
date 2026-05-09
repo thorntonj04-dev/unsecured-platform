@@ -931,30 +931,53 @@ function ThinkingPage({ essays, setEssay, mobile, px, scrollTargetRef }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
   const [copied, setCopied] = useState(false);
-  const [linkedInDraft, setLinkedInDraft] = useState(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareDraft, setShareDraft] = useState("");
 
   function shareUrl() {
     return window.location.origin + "/essay/" + essay.id;
   }
 
-  function copyLink() {
-    navigator.clipboard.writeText(shareUrl()).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-      trackEvent({ type: "share_click", platform: "Copy Link", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
-    });
+  const themeHashtags = {
+    Pressure:         "#Leadership #Burnout #WorkplaceCulture #HighPerformance #Resilience #Pressure",
+    Urgency:          "#Urgency #Productivity #WorkplaceCulture #Leadership #MentalHealth #Burnout",
+    "Internal Rules": "#SelfAwareness #PersonalGrowth #Leadership #WorkplaceCulture #MindsetShift",
+    Reconfiguration:  "#PersonalDevelopment #Leadership #WorkplaceCulture #Growth #Reconfiguration",
+  };
+
+  function openShare() {
+    const url = shareUrl();
+    const hashtags = themeHashtags[essay.theme] || "#Leadership #WorkplaceCulture #PersonalGrowth";
+    const quote = essay.pullQuote || essay.hook;
+    const draft = [
+      essay.hook,
+      "",
+      `"${quote}"`,
+      "",
+      `Full essay → ${url}`,
+      "",
+      hashtags,
+    ].join("\n");
+    setShareDraft(draft);
+    setShareOpen(true);
   }
 
-  function shareX() {
-    const text = `${essay.pullQuote}\n\n— "${essay.title}"`;
+  function postToLinkedIn() {
+    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareDraft)}`, "_blank", "noopener,noreferrer");
+    trackEvent({ type: "share_click", platform: "LinkedIn", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
+  }
+
+  function postToX() {
+    const quote = essay.pullQuote || essay.hook;
+    const xText = `"${quote}"\n\n— ${essay.title}`;
     window.open(
-      `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl())}`,
+      `https://x.com/intent/tweet?text=${encodeURIComponent(xText)}&url=${encodeURIComponent(shareUrl())}`,
       "_blank", "noopener,noreferrer"
     );
     trackEvent({ type: "share_click", platform: "X", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
   }
 
-  function shareFacebook() {
+  function postToFacebook() {
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl())}`,
       "_blank", "noopener,noreferrer"
@@ -962,35 +985,12 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
     trackEvent({ type: "share_click", platform: "Facebook", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
   }
 
-  const themeHashtags = {
-    Pressure: "#Pressure #Leadership #Burnout",
-    Urgency: "#Urgency #Productivity #Mindfulness",
-    "Internal Rules": "#SelfAwareness #PersonalGrowth #MindsetShift",
-    Reconfiguration: "#Reconfiguration #PersonalDevelopment #Growth",
-  };
-
-  function openLinkedIn() {
-    const hashtags = themeHashtags[essay.theme] || "#PersonalGrowth #Leadership";
-    const draft = [
-      essay.hook,
-      "",
-      essay.subhead,
-      "",
-      "One line that keeps coming back to me:",
-      "",
-      `"${essay.pullQuote}"`,
-      "",
-      `Full essay → ${shareUrl()}`,
-      "",
-      hashtags,
-    ].join("\n");
-    setLinkedInDraft(draft);
-    trackEvent({ type: "share_click", platform: "LinkedIn", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
-  }
-
-  function postToLinkedIn() {
-    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(linkedInDraft)}`, "_blank", "noopener,noreferrer");
-    setLinkedInDraft(null);
+  function copyText() {
+    navigator.clipboard.writeText(shareDraft).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+      trackEvent({ type: "share_click", platform: "Copy Text", essayId: essay.id, essayTitle: essay.title, sessionId: getSessionId(), device: getDevice() });
+    });
   }
   const related = essay.related.map(id=>all.find(e=>e.id===id)).filter(Boolean);
   const totalH = typeof document!=="undefined" ? document.body?.scrollHeight - window.innerHeight : 1;
@@ -998,30 +998,52 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
 
   return (
     <div style={{ background:C.g100 }}>
-      {/* LinkedIn compose modal */}
-      {linkedInDraft !== null && (
-        <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(13,23,32,.72)",display:"flex",alignItems:"center",justifyContent:"center",padding:20 }}
-          onClick={() => setLinkedInDraft(null)}>
-          <div style={{ background:"white",maxWidth:520,width:"100%",padding: mobile ? "28px 22px" : "36px 40px",boxShadow:"0 24px 64px rgba(0,0,0,.3)" }}
+      {/* Unified share modal */}
+      {shareOpen && (
+        <div style={{ position:"fixed",inset:0,zIndex:500,background:"rgba(13,23,32,.8)",display:"flex",alignItems:"center",justifyContent:"center",padding:20 }}
+          onClick={() => setShareOpen(false)}>
+          <div style={{ background:"white",maxWidth:560,width:"100%",padding: mobile ? "24px 20px" : "32px 36px",boxShadow:"0 24px 64px rgba(0,0,0,.35)",maxHeight:"92vh",overflowY:"auto" }}
             onClick={e => e.stopPropagation()}>
-            <p className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.gold,marginBottom:8 }}>Share on LinkedIn</p>
-            <p className="ss" style={{ fontSize:13,color:C.g600,lineHeight:1.7,marginBottom:16 }}>
-              Edit or add your own thoughts, then post.
-            </p>
+            {/* Header */}
+            <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20 }}>
+              <p className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.gold,margin:0 }}>Share This Essay</p>
+              <button onClick={() => setShareOpen(false)}
+                style={{ background:"none",border:"none",cursor:"pointer",fontSize:20,color:C.g400,lineHeight:1,padding:"0 4px" }}>×</button>
+            </div>
+            {/* OG card preview */}
+            <img
+              src={`/api/og/${essay.id}`}
+              alt="Essay preview card"
+              style={{ width:"100%",display:"block",marginBottom:20,border:`1px solid ${C.g200}` }}
+            />
+            {/* Editable post blurb */}
+            <p className="ss" style={{ fontSize:11,color:C.g400,letterSpacing:".08em",textTransform:"uppercase",marginBottom:8 }}>Your post</p>
             <textarea
               autoFocus
-              value={linkedInDraft}
-              onChange={e => setLinkedInDraft(e.target.value)}
-              rows={9}
-              style={{ width:"100%",boxSizing:"border-box",fontFamily:"'Source Sans 3',sans-serif",fontSize:14,lineHeight:1.75,color:C.g800,border:`1px solid ${C.g200}`,padding:"14px 16px",resize:"vertical",outline:"none",background:C.g100,marginBottom:20 }}
+              value={shareDraft}
+              onChange={e => setShareDraft(e.target.value)}
+              rows={8}
+              style={{ width:"100%",boxSizing:"border-box",fontFamily:"'Source Sans 3',sans-serif",fontSize:13,lineHeight:1.75,color:C.g800,border:`1px solid ${C.g200}`,padding:"14px 16px",resize:"vertical",outline:"none",background:C.g100,marginBottom:6 }}
             />
-            <div style={{ display:"flex",gap:10,justifyContent:"flex-end" }}>
-              <button onClick={() => setLinkedInDraft(null)}
-                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"9px 18px",background:"transparent",color:C.g600,border:`1px solid ${C.g200}`,cursor:"pointer" }}>
-                Cancel
+            <p className="ss" style={{ fontSize:11,color:C.g400,lineHeight:1.6,marginBottom:20 }}>
+              Edit freely · X post uses a condensed version · Facebook uses the article preview image
+            </p>
+            {/* Platform buttons */}
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+              <button onClick={postToLinkedIn} className="btn-d" style={{ fontSize:11,justifySelf:"stretch" }}>
+                Post to LinkedIn
               </button>
-              <button onClick={postToLinkedIn} className="btn-d" style={{ fontSize:11 }}>
-                Post to LinkedIn →
+              <button onClick={postToX}
+                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"11px 18px",background:C.navy,color:"white",border:"none",cursor:"pointer" }}>
+                Post to X
+              </button>
+              <button onClick={postToFacebook}
+                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"11px 18px",background:"#1877f2",color:"white",border:"none",cursor:"pointer" }}>
+                Share on Facebook
+              </button>
+              <button onClick={copyText}
+                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"11px 18px",background:"transparent",color:C.g600,border:`1px solid ${C.g200}`,cursor:"pointer" }}>
+                {copied ? "Copied!" : "Copy Text"}
               </button>
             </div>
           </div>
@@ -1094,21 +1116,14 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
 
         {/* Share */}
         <Reveal>
-          <div style={{ marginTop:48, paddingTop:28, borderTop:`1px solid ${C.g200}`, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+          <div style={{ marginTop:48, paddingTop:28, borderTop:`1px solid ${C.g200}`, display:"flex", alignItems:"center", gap:10 }}>
             <span className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",color:C.g400,marginRight:4 }}>Share</span>
-            {[
-              { label: "X", fn: shareX },
-              { label: "LinkedIn", fn: openLinkedIn },
-              { label: "Facebook", fn: shareFacebook },
-              { label: copied ? "Copied!" : "Copy Link", fn: copyLink },
-            ].map(({ label, fn }) => (
-              <button key={label} onClick={fn}
-                style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"8px 14px",background:"white",color:C.g600,border:`1px solid ${C.g200}`,cursor:"pointer",transition:"all .2s" }}
-                onMouseOver={e=>{e.currentTarget.style.borderColor=C.navy;e.currentTarget.style.color=C.navy}}
-                onMouseOut={e=>{e.currentTarget.style.borderColor=C.g200;e.currentTarget.style.color=C.g600}}>
-                {label}
-              </button>
-            ))}
+            <button onClick={openShare}
+              style={{ fontFamily:"'Source Sans 3',sans-serif",fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",padding:"8px 18px",background:C.navy,color:"white",border:"none",cursor:"pointer",transition:"all .2s" }}
+              onMouseOver={e=>e.currentTarget.style.opacity=".85"}
+              onMouseOut={e=>e.currentTarget.style.opacity="1"}>
+              Share This Essay →
+            </button>
           </div>
         </Reveal>
       </div>
