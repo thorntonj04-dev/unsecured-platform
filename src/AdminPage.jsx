@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   signIn, signOut, onAuthChange,
   fetchAllEssays, saveEssay, deleteEssay,
@@ -578,47 +578,79 @@ function CustomCardTab() {
   );
 }
 
-// ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
-function CardNoteItem({ essay, note, onChange }) {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
-  const hasNote = note.trim().length > 0;
-  const imgSrc = `${OG_ORIGIN}/api/og/${essay.id}`;
+// ─── CARD PREVIEW (CSS-rendered, no network dependency) ──────────────────────
+const CARD_TC = {
+  Pressure:         { hex: "#8b6e52", rgba: "rgba(139,110,82,0.5)" },
+  Urgency:          { hex: "#4e6878", rgba: "rgba(78,104,120,0.5)" },
+  "Internal Rules": { hex: "#5f7050", rgba: "rgba(95,112,80,0.5)" },
+  Reconfiguration:  { hex: "#7a6b52", rgba: "rgba(122,107,82,0.5)" },
+};
+
+function CardPreview({ essay }) {
+  const wrapRef = useRef(null);
+  const [scale, setScale] = useState(0.4);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => setScale(el.offsetWidth / 1200);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const theme = CARD_TC[essay.theme] || CARD_TC.Pressure;
+  const rawQuote = essay.pullQuote || essay.hook || "";
+  const quote = rawQuote.length > 185 ? rawQuote.slice(0, 182) + "…" : rawQuote;
+  const label = essay.title.length > 65 ? essay.title.slice(0, 62) + "…" : essay.title;
+  const qfs = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
 
   return (
-    <div style={{
-      background: "white",
-      border: `1.5px solid ${hasNote ? C.gold : C.g200}`,
-      overflow: "hidden",
-      transition: "border-color .2s",
-    }}>
-      {/* OG card preview */}
-      <div style={{ position: "relative", background: "#0d1720" }}>
-        {!imgError && (
-          <img
-            src={imgSrc}
-            alt={`Card: ${essay.title}`}
-            loading="lazy"
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgError(true)}
-            style={{ width: "100%", display: "block", opacity: imgLoaded ? 1 : 0, transition: "opacity .3s" }}
-          />
-        )}
-        {!imgLoaded && !imgError && (
-          <div style={{ background: "#0d1720", padding: "48px 32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.25)", letterSpacing: ".12em", textTransform: "uppercase" }}>Loading…</span>
+    <div ref={wrapRef} style={{ width: "100%", height: Math.round(630 * scale), overflow: "hidden" }}>
+      <div style={{ width: 1200, height: 630, transform: `scale(${scale})`, transformOrigin: "top left", display: "flex", background: "#0d1720" }}>
+        {/* Gold bar */}
+        <div style={{ width: 8, height: "100%", background: "#b8943f", flexShrink: 0 }} />
+        {/* Main column */}
+        <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: "52px 76px 52px 72px", justifyContent: "space-between" }}>
+          {/* Theme badge */}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <span style={{ padding: "6px 18px", border: `1px solid ${theme.hex}`, background: theme.rgba, color: theme.hex, fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "'Source Sans 3',sans-serif" }}>
+              {essay.theme}
+            </span>
           </div>
-        )}
-        {imgError && (
-          <div style={{ background: "#0d1720", padding: "48px 32px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-            <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, color: "rgba(244,239,230,.3)", letterSpacing: ".08em" }}>Card failed to load</span>
-            <a href={imgSrc} target="_blank" rel="noopener noreferrer"
-              style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: C.gold, textDecoration: "none" }}>
-              Open directly →
-            </a>
+          {/* Quote block */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(184,148,63,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 18, fontFamily: "'Source Sans 3',sans-serif" }}>
+              FROM: {label}
+            </div>
+            <div style={{ height: 1, background: "rgba(184,148,63,0.45)", marginBottom: 32 }} />
+            <div style={{ fontSize: qfs, fontWeight: 400, fontStyle: "italic", color: "#f4efe6", lineHeight: 1.5, letterSpacing: "-0.01em", maxWidth: 980, fontFamily: "Georgia,serif" }}>
+              &ldquo;{quote}&rdquo;
+            </div>
           </div>
-        )}
+          {/* Byline */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "#b8943f", letterSpacing: "0.05em", fontFamily: "'Source Sans 3',sans-serif" }}>John Thornton</div>
+              <div style={{ fontSize: 14, color: "rgba(244,239,230,0.35)", letterSpacing: "0.1em", fontFamily: "'Source Sans 3',sans-serif" }}>unsecured.info</div>
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(244,239,230,0.09)", letterSpacing: "0.35em", fontFamily: "'Source Sans 3',sans-serif" }}>UNSECURED</div>
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ─── CARD REVIEW TAB ─────────────────────────────────────────────────────────
+function CardNoteItem({ essay, note, onChange }) {
+  const hasNote = note.trim().length > 0;
+
+  return (
+    <div style={{ background: "white", border: `1.5px solid ${hasNote ? C.gold : C.g200}`, overflow: "hidden", transition: "border-color .2s" }}>
+      {/* CSS-rendered card preview — no network dependency */}
+      <CardPreview essay={essay} />
 
       {/* Essay meta */}
       <div style={{ padding: "14px 16px 0" }}>
@@ -629,9 +661,13 @@ function CardNoteItem({ essay, note, onChange }) {
             letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 8px",
             background: `${TC[essay.theme]}15`, color: TC[essay.theme], border: `1px solid ${TC[essay.theme]}30`,
           }}>{essay.theme}</span>
-          <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, marginLeft: "auto", color: essay.published !== false ? C.green : C.g400 }}>
+          <span style={{ fontFamily: "'Source Sans 3',sans-serif", fontSize: 11, fontWeight: 700, color: essay.published !== false ? C.green : C.g400 }}>
             {essay.published !== false ? "Live" : "Draft"}
           </span>
+          <a href={`${OG_ORIGIN}/api/og/${essay.id}`} target="_blank" rel="noopener noreferrer"
+            style={{ marginLeft: "auto", fontFamily: "'Source Sans 3',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: C.gold, textDecoration: "none" }}>
+            View live card →
+          </a>
         </div>
         <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 14, fontWeight: 700, color: C.navy, margin: "0 0 12px", lineHeight: 1.35 }}>{essay.title}</p>
       </div>
