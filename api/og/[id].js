@@ -4,10 +4,10 @@ import { LOCAL_ESSAYS } from '../../src/essays.js';
 export const config = { runtime: 'edge' };
 
 const TC = {
-  Pressure:        { hex: '#8b6e52', rgba: 'rgba(139,110,82,0.55)' },
-  Urgency:         { hex: '#4e6878', rgba: 'rgba(78,104,120,0.55)' },
-  'Internal Rules':{ hex: '#5f7050', rgba: 'rgba(95,112,80,0.55)' },
-  Reconfiguration: { hex: '#7a6b52', rgba: 'rgba(122,107,82,0.55)' },
+  Pressure:         { hex: '#8b6e52', rgba: 'rgba(139,110,82,0.5)' },
+  Urgency:          { hex: '#4e6878', rgba: 'rgba(78,104,120,0.5)' },
+  'Internal Rules': { hex: '#5f7050', rgba: 'rgba(95,112,80,0.5)' },
+  Reconfiguration:  { hex: '#7a6b52', rgba: 'rgba(122,107,82,0.5)' },
 };
 
 function h(type, props, ...children) {
@@ -28,10 +28,14 @@ export default async function handler(req) {
   }
 
   const theme = TC[essay.theme] || TC.Pressure;
-  const titleSize = essay.title.length > 44 ? '50px' : '62px';
-  const subhead = essay.subhead.length > 82
-    ? essay.subhead.slice(0, 79) + '…'
-    : essay.subhead;
+
+  const rawQuote = essay.pullQuote || essay.hook;
+  const quote = rawQuote.length > 185 ? rawQuote.slice(0, 182) + '…' : rawQuote;
+
+  const label = essay.title.length > 65 ? essay.title.slice(0, 62) + '…' : essay.title;
+
+  // Larger font for short quotes, smaller for long ones
+  const quoteFontSize = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
 
   return new ImageResponse(
     h('div', {
@@ -58,45 +62,76 @@ export default async function handler(req) {
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
-          padding: '64px 80px 56px 72px',
+          padding: '52px 76px 52px 72px',
           justifyContent: 'space-between',
         },
       },
-        // Top: theme badge + title
+
+        // TOP: theme badge, right-aligned
         h('div', {
-          style: { display: 'flex', flexDirection: 'column', gap: 24 },
+          style: { display: 'flex', justifyContent: 'flex-end' },
         },
-          // Theme badge — alignSelf instead of width:fit-content (not supported in Satori)
           h('div', {
             style: {
               display: 'flex',
               alignSelf: 'flex-start',
-              padding: '6px 16px',
+              padding: '6px 18px',
               borderWidth: 1,
               borderStyle: 'solid',
               borderColor: theme.hex,
               background: theme.rgba,
               color: theme.hex,
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: 700,
-              letterSpacing: '0.2em',
+              letterSpacing: '0.22em',
               textTransform: 'uppercase',
             },
           }, essay.theme),
-          // Title
+        ),
+
+        // MIDDLE: essay label + gold rule + quote (the hero)
+        h('div', {
+          style: { display: 'flex', flexDirection: 'column' },
+        },
+          // "FROM:" label
           h('div', {
             style: {
               display: 'flex',
-              fontSize: titleSize,
-              fontWeight: 900,
-              color: '#f4efe6',
-              lineHeight: 1.08,
-              letterSpacing: '-0.02em',
-              maxWidth: 960,
+              fontSize: 13,
+              fontWeight: 700,
+              color: 'rgba(184,148,63,0.6)',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              marginBottom: 18,
             },
-          }, essay.title),
+          }, `FROM: ${label}`),
+
+          // Gold rule
+          h('div', {
+            style: {
+              display: 'flex',
+              height: 1,
+              background: 'rgba(184,148,63,0.45)',
+              marginBottom: 32,
+            },
+          }),
+
+          // Pull quote — the hero
+          h('div', {
+            style: {
+              display: 'flex',
+              fontSize: quoteFontSize,
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#f4efe6',
+              lineHeight: 1.5,
+              letterSpacing: '-0.01em',
+              maxWidth: 980,
+            },
+          }, `“${quote}”`),
         ),
-        // Bottom: subhead + author/wordmark
+
+        // BOTTOM: author left, site + wordmark right
         h('div', {
           style: {
             display: 'flex',
@@ -104,43 +139,39 @@ export default async function handler(req) {
             alignItems: 'flex-end',
           },
         },
+          // Author block
           h('div', {
-            style: {
-              display: 'flex',
-              fontSize: 21,
-              color: 'rgba(244,239,230,0.48)',
-              fontStyle: 'italic',
-              lineHeight: 1.5,
-              maxWidth: 620,
-            },
-          }, subhead),
-          h('div', {
-            style: {
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              gap: 6,
-            },
+            style: { display: 'flex', flexDirection: 'column', gap: 5 },
           },
             h('div', {
               style: {
                 display: 'flex',
-                fontSize: 15,
+                fontSize: 17,
+                fontWeight: 700,
                 color: '#b8943f',
-                fontWeight: 600,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.05em',
               },
             }, 'John Thornton'),
             h('div', {
               style: {
                 display: 'flex',
-                fontSize: 19,
-                color: 'rgba(244,239,230,0.16)',
-                fontWeight: 900,
-                letterSpacing: '0.3em',
+                fontSize: 14,
+                fontWeight: 400,
+                color: 'rgba(244,239,230,0.35)',
+                letterSpacing: '0.1em',
               },
-            }, 'UNSECURED'),
+            }, 'unsecured.info'),
           ),
+          // Faint wordmark
+          h('div', {
+            style: {
+              display: 'flex',
+              fontSize: 15,
+              fontWeight: 900,
+              color: 'rgba(244,239,230,0.09)',
+              letterSpacing: '0.35em',
+            },
+          }, 'UNSECURED'),
         ),
       ),
     ),
