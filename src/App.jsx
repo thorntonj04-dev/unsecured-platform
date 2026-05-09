@@ -924,13 +924,44 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
     });
   }
 
-  function shareTwitter() {
-    const text = `"${essay.hook}" — ${essay.title} by @JohnThornton`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl())}`, "_blank", "noopener,noreferrer");
+  function shareX() {
+    const text = `${essay.pullQuote}\n\n— "${essay.title}"`;
+    window.open(
+      `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl())}`,
+      "_blank", "noopener,noreferrer"
+    );
   }
 
+  function shareFacebook() {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl())}`,
+      "_blank", "noopener,noreferrer"
+    );
+  }
+
+  const themeHashtags = {
+    Pressure: "#Pressure #Leadership #Burnout",
+    Urgency: "#Urgency #Productivity #Mindfulness",
+    "Internal Rules": "#SelfAwareness #PersonalGrowth #MindsetShift",
+    Reconfiguration: "#Reconfiguration #PersonalDevelopment #Growth",
+  };
+
   function openLinkedIn() {
-    setLinkedInDraft(`"${essay.hook}"\n\n${essay.title}\n${shareUrl()}`);
+    const hashtags = themeHashtags[essay.theme] || "#PersonalGrowth #Leadership";
+    const draft = [
+      essay.hook,
+      "",
+      essay.subhead,
+      "",
+      "One line that keeps coming back to me:",
+      "",
+      `"${essay.pullQuote}"`,
+      "",
+      `Full essay → ${shareUrl()}`,
+      "",
+      hashtags,
+    ].join("\n");
+    setLinkedInDraft(draft);
   }
 
   function postToLinkedIn() {
@@ -951,7 +982,7 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
             onClick={e => e.stopPropagation()}>
             <p className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:C.gold,marginBottom:8 }}>Share on LinkedIn</p>
             <p className="ss" style={{ fontSize:13,color:C.g600,lineHeight:1.7,marginBottom:16 }}>
-              Add your thoughts at the top, then post.
+              Edit or add your own thoughts, then post.
             </p>
             <textarea
               autoFocus
@@ -1042,8 +1073,9 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
           <div style={{ marginTop:48, paddingTop:28, borderTop:`1px solid ${C.g200}`, display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
             <span className="ss" style={{ fontSize:11,fontWeight:700,letterSpacing:".12em",textTransform:"uppercase",color:C.g400,marginRight:4 }}>Share</span>
             {[
-              { label: "Twitter / X", fn: shareTwitter },
+              { label: "X", fn: shareX },
               { label: "LinkedIn", fn: openLinkedIn },
+              { label: "Facebook", fn: shareFacebook },
               { label: copied ? "Copied!" : "Copy Link", fn: copyLink },
             ].map(({ label, fn }) => (
               <button key={label} onClick={fn}

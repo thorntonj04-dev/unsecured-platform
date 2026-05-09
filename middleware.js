@@ -31,6 +31,7 @@ export default async function middleware(request) {
   const title = esc(essay.title);
   const desc = esc(essay.hook);
   const canonicalUrl = `${url.origin}/essay/${id}`;
+  const ogImage = `${url.origin}/api/og/${id}`;
 
   const tags =
     `<title>${title} — Unsecured</title>\n` +
@@ -40,9 +41,13 @@ export default async function middleware(request) {
     `    <meta property="og:title" content="${title} — Unsecured" />\n` +
     `    <meta property="og:description" content="${desc}" />\n` +
     `    <meta property="og:url" content="${canonicalUrl}" />\n` +
-    `    <meta name="twitter:card" content="summary" />\n` +
+    `    <meta property="og:image" content="${ogImage}" />\n` +
+    `    <meta property="og:image:width" content="1200" />\n` +
+    `    <meta property="og:image:height" content="630" />\n` +
+    `    <meta name="twitter:card" content="summary_large_image" />\n` +
     `    <meta name="twitter:title" content="${title}" />\n` +
-    `    <meta name="twitter:description" content="${desc}" />\n`;
+    `    <meta name="twitter:description" content="${desc}" />\n` +
+    `    <meta name="twitter:image" content="${ogImage}" />\n`;
 
   html = html.replace("<head>", `<head>\n    ${tags}`);
 

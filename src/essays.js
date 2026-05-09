@@ -10,6 +10,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "Why Endurance Is the Wrong Goal",
     hook: "We've been taught to measure strength by how much we can carry. That measurement is wrong.",
+    pullQuote: "Pressure is a signal, not a test. Tests are meant to be passed. Signals are meant to be read. The moment you confuse the two, endurance becomes a form of avoidance.",
     subhead: "The case against treating pressure like a test of character",
     body: [
       "There's a quiet belief most high-performers carry into every difficult season: if I can just hold on long enough, things will stabilize. The endurance itself becomes the strategy. The suffering becomes the proof of commitment.",
@@ -28,6 +29,7 @@ export const LOCAL_ESSAYS = [
     readTime: "5 min",
     title: "Normal Is a Disguise",
     hook: "The most dangerous pressure doesn't announce itself. It settles in and starts looking like your life.",
+    pullQuote: "Normal is the most convincing disguise pressure can wear. A life that functions on the outside can be running well past its limits on the inside.",
     subhead: "On how sustained load becomes invisible",
     body: [
       "Normal is the most convincing disguise pressure can wear. A life that functions on the outside can be running well past its limits on the inside. The performance continues. The deliverables land. The cost accumulates in places no one is measuring.",
@@ -43,6 +45,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "The Loop That Teaches Urgency to Lie",
     hook: "Every time urgency fires and you act and feel relief — the loop gets stronger. The relief isn't proof the action was necessary.",
+    pullQuote: "The quiet that follows action isn't evidence of correctness. It's evidence of compliance.",
     subhead: "How the urgency-action-relief cycle rewires what feels true",
     body: [
       "Urgency feels like truth. That's the problem. It arrives before thinking, before evaluation, before any question of whether the signal is accurate. By the time you're aware of it, you're already in motion.",
@@ -60,6 +63,7 @@ export const LOCAL_ESSAYS = [
     readTime: "5 min",
     title: "Speed Is Not the Same as Importance",
     hook: "When urgency becomes the default, everything feels equally critical. That's not clarity — that's noise.",
+    pullQuote: "A message arriving at 10pm is not more important because it arrived at 10pm.",
     subhead: "On how urgency collapses the difference between what's fast and what matters",
     body: [
       "Urgency has one move: it makes things feel immediate. It doesn't evaluate importance. It doesn't weigh consequences. It compresses every signal into a single instruction: act now.",
@@ -75,6 +79,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "The Rules You Didn't Choose",
     hook: "Most of the rules you live by weren't decided. They were absorbed. And they've been making decisions ever since.",
+    pullQuote: "Rules don't announce themselves. They form quietly — in moments of necessity, in patterns we watched growing up. By the time we're adults, most of the rules are already running.",
     subhead: "On the configurations we carry from earlier seasons of life",
     body: [
       "Rules don't announce themselves. They form quietly — in moments of necessity, in patterns we watched growing up. By the time we're adults, most of the rules are already running. We just don't know it.",
@@ -92,6 +97,7 @@ export const LOCAL_ESSAYS = [
     readTime: "5 min",
     title: "When Identity Gets Tied to Output",
     hook: "When performance becomes who you are, every missed deadline is a verdict about your worth.",
+    pullQuote: "A missed deadline is no longer a scheduling problem. It's evidence of inadequacy. The system can no longer rest, because the threat isn't workload — it's exposure.",
     subhead: "The specific cost of building yourself around what you deliver",
     body: [
       "There's a version of work ethic that tips into something else. It starts as responsibility and sharpens into identity — the point where what you produce becomes the answer to who you are.",
@@ -108,6 +114,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "Why Rest Doesn't Fix It",
     hook: "If rest were the solution, you'd feel better by now. The fact that you don't is useful information.",
+    pullQuote: "What rest can't fix is a misconfiguration. If the system is running rules that keep it in low-grade alertness, rest is a pause in that state — not a change to it.",
     subhead: "On what rest can't reach — and what actually needs attention",
     body: [
       "The advice is everywhere: rest more, disconnect. But for a certain kind of exhaustion, rest doesn't touch it. You take the vacation and come back just as depleted.",
@@ -123,6 +130,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "Visibility Before Change",
     hook: "You can't reconfigure what you can't see. And most people skip straight to trying to change.",
+    pullQuote: "Visibility was never meant to change the system. It was meant to show you where authority lives. That's what has to move before behavior can change sustainably.",
     subhead: "Why inspection — not action — is the first move",
     body: [
       "There's a sequence that matters here, and most people collapse it. They feel something wrong and move immediately to correction. New habits. New commitments. The energy goes into change before the problem is understood.",
@@ -139,6 +147,7 @@ export const LOCAL_ESSAYS = [
     readTime: "5 min",
     title: "Baselines Don't Drift — They're Pulled",
     hook: "You didn't choose your current baseline. It formed while you were surviving something.",
+    pullQuote: "Baselines don't drift randomly. They get pulled into place by the heaviest seasons and stay there. Recognizing that isn't self-pity. It's the beginning of an honest audit.",
     subhead: "On how survival settings outlast the emergencies that created them",
     body: [
       "No one decides to make chronic alertness their default state. Those settings form in response to real conditions — real seasons where survival required a different posture.",
@@ -155,6 +164,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "What It Means to Live with Margin",
     hook: "Margin isn't emptiness. It's the space where judgment lives.",
+    pullQuote: "The goal isn't protection from difficulty. The goal is a system configured to encounter difficulty without being destabilized by it.",
     subhead: "On building a system that can absorb pressure without being defined by it",
     body: [
       "Margin gets misread as leisure — the buffer responsible people can't afford. But margin isn't what's left over when the real work is done. It's what makes the real work possible.",
@@ -175,6 +185,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "The Body Noticed First",
     hook: "Your mind will explain away the pressure long before your body agrees to go along with the story.",
+    pullQuote: "The body records things the mind is still explaining away. Physical signals are the most honest instrument you have — they fire before the story does.",
     subhead: "On physical symptoms as the first honest diagnostic data",
     body: [
       "I wore one wireless earbud almost constantly during that season. Left ear, right ear, swapping them to extend the battery — calls stacked on top of calls, hours of Zoom troubleshooting, systems that demanded attention the moment one was resolved. Lindsey noticed the pattern before I did. Every time the earbud went in, a headache started or got worse. When my second pair of AirPods finally died and I didn't replace them, the headaches didn't vanish completely. But they stopped being constant.",
@@ -196,6 +207,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "What You Built Out of Endurance",
     hook: "The things you survived didn't just leave memories. They left instructions.",
+    pullQuote: "Every time I pushed through impossible conditions, the system logged a lesson: this is how you function. Endurance works. Adding more capacity is always the next move.",
     subhead: "How surviving pressure converts into a rule for how to operate",
     body: [
       "Pressure doesn't teach lessons once. It teaches responses. And once a response works — even temporarily, even under conditions that no longer exist — it becomes the default. I didn't learn this in a classroom or from a mentor. I learned it by enduring things and watching what happened next.",
@@ -217,6 +229,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "The Cost of Being the Capable One",
     hook: "Reliability is a gift until it becomes an assumption. Once it becomes an assumption, it becomes a rule.",
+    pullQuote: "Reliability without boundaries eventually becomes exposure. When everything can reach you because you've always handled everything, the gate is effectively open.",
     subhead: "How being dependable stops being a choice and starts being a condition",
     body: [
       "There is a version of being capable that people praise and another version that quietly consumes everything. They look identical from the outside. The distinction is whether the capability was chosen or whether it became the price of belonging.",
@@ -238,6 +251,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "How Pressure Taught Me the Wrong Lesson",
     hook: "I didn't misread pressure once. I misread it for a decade, consistently enough to call it a worldview.",
+    pullQuote: "I had built an entire interpretive framework around a misread signal. And worldviews are very hard to see from the inside.",
     subhead: "On building an entire operating system around a mistaken interpretation",
     body: [
       "There was a long stretch of my life where I believed pressure was proof that I was doing something right. If I was tired, it meant I was responsible. If I was overwhelmed, it meant I was dependable. If I felt like I was carrying more than I could hold, it meant I was needed. That belief didn't arrive all at once. It was built slowly, reinforced through every environment I found myself in.",
@@ -261,6 +275,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "The Fire Drill You Agreed To",
     hook: "At some point, the emergency became the schedule. I stopped noticing the transition.",
+    pullQuote: "You can't opt out of this pattern by trying harder. Trying harder is what the urgency-configured system asks for. The only exit is recognizing what you agreed to.",
     subhead: "When urgency becomes the default operating mode",
     body: [
       "About a year into my first role in cloud security, I got comfortable with fire drill culture. Large projects would appear out of nowhere, already behind schedule. Application teams would call at the last minute — always the last minute — because they had failed to think about security during planning and were now weeks away from a launch with nothing in place. The urgency was real in those moments. The stakes were real. I responded accordingly.",
@@ -281,6 +296,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "What You Traded for Speed",
     hook: "Speed felt like an upgrade. It was actually a trade. I didn't know what I was giving away until it was already gone.",
+    pullQuote: "What urgency takes isn't always obvious because it doesn't take loudly. It thins discernment. It collapses the distance between signal and response until evaluation doesn't have time to happen.",
     subhead: "The hidden costs of operating at urgency as a default",
     body: [
       "Microsoft was behind in app numbers, and they set a challenge: the first five students at partner schools to publish twenty apps would receive a brand-new Surface tablet. My mind did exactly what yours just did. Tablet, you say? I spent three nights at the kitchen table after work, building and submitting app after app. I was the second to hit twenty. I got the tablet. All it took was trading sleep for urgency.",
@@ -301,6 +317,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "When Authority Shortcircuits Judgment",
     hook: "The VP outranked me. My system didn't wait to find out if that mattered.",
+    pullQuote: "It's not a failure of intelligence. It's a feature of the configuration. Without evaluation between signal and response, the system isn't choosing — it's complying.",
     subhead: "How status triggers urgency and bypasses evaluation",
     body: [
       "The VP explained the situation. A massive project nearly complete. Antivirus not yet deployed on the systems. If the launch happened without it, the whole thing could be stopped. Revenue impacted. Timeline blown. He needed this done, and he needed it done fast.",
@@ -321,6 +338,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "The Rule Underneath the Habit",
     hook: "I didn't learn that urgency worked by being told. I learned it by watching who got rewarded.",
+    pullQuote: "Rules written through observation are harder to examine than rules you were explicitly taught. They feel like reality. You don't experience them as beliefs — you experience them as just how things are.",
     subhead: "How behavioral rules get written through observation, not instruction",
     body: [
       "I grew up around the military. My dad was in the Air Force, and I lived the military-dependent life for eighteen years. The phrase I heard most often wasn't a command directed at me. It was something said in passing, repeated in the environment: being on time is late. Being five minutes early is ten minutes late. I don't remember being lectured about it. I remember watching what happened to people who weren't early. I remember nothing bad happening to our family because we always were.",
@@ -343,6 +361,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "When the Fixer Becomes the Fix",
     hook: "My manager called me the fixer after four years. I had been waiting for the word. I didn't know it would cost me.",
+    pullQuote: "Identity-based rules are the hardest to examine because examining them feels like self-betrayal.",
     subhead: "How a title becomes an identity that runs itself",
     body: [
       "It took four years for my manager to call me the fixer. By then, I had done enough — solved enough problems, absorbed enough workload, said yes enough times — that the title felt earned. More than that. It felt like recognition. Like something I had been working toward without knowing I was working toward it.",
@@ -364,6 +383,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "The Rules That Run Without Permission",
     hook: "Some of your most powerful operating instructions were never consciously approved.",
+    pullQuote: "You are not your rules. The rules are configurations. They were installed through experience, through observation, through survival. What was installed can be examined.",
     subhead: "On internal rules absorbed without agreement — and how to find them",
     body: [
       "I didn't consciously choose most of the rules I spent years living by. I didn't sit down at some point and decide: I will always be available, I will treat requests from authority as urgent, I will measure my value by what I deliver. Those rules formed slowly, in response to real conditions, and by the time I could have questioned them, they felt like obvious facts rather than decisions I had made.",
@@ -385,6 +405,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "The Illusion of Not Breaking",
     hook: "High performers often don't break loudly. They continue performing right through the breaking.",
+    pullQuote: "High performers rarely break in ways that are easy to see. What degrades quietly is everything underneath the output — judgment, presence, the capacity to assess whether a given request is reasonable.",
     subhead: "On why the absence of visible failure is not the same as health",
     body: [
       "I was the endpoint team. Not a member of it — the whole thing. After my cohort moved on, the workload didn't decrease. The coverage did. What had been a shared responsibility became entirely mine, and the system kept running because I kept running it. From the outside, it still looked like a functioning endpoint team. From the inside, it was one person sustaining a load designed for multiple people and slowly forgetting what normal felt like.",
@@ -405,6 +426,7 @@ export const LOCAL_ESSAYS = [
     readTime: "6 min",
     title: "What Capability Hides",
     hook: "The most useful information I had about myself was hidden behind how well I was doing.",
+    pullQuote: "Control doesn't actually live in performance. It lives in the story you build around performance — the narrative that says as long as things are working, things are fine.",
     subhead: "When performance covers the signal that would prompt intervention",
     body: [
       "Here is the specific problem with being capable: capability makes it very hard to ask for help, because the evidence that help is needed is hidden beneath the evidence of continued functioning. You deliver. You solve things. You handle what needs handling. Nothing has failed loudly. Everything points toward health. And you use that evidence to tell yourself you're fine — even when you're not.",
@@ -427,6 +449,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "What Changed While You Were Surviving",
     hook: "You don't remember choosing this baseline. You remember surviving something. That's not the same thing.",
+    pullQuote: "Baselines don't collapse. They drift. The emergency posture that was necessary in a hard season quietly becomes the normal posture — and keeps running long after the emergency resolves.",
     subhead: "On emergency configurations that outlasted their emergencies",
     body: [
       "Baselines don't collapse. They drift. There is no clear break point, no obvious failure, no moment that announces itself as the beginning of a different way of operating. What happens instead is slower and harder to detect. The emergency posture that was necessary in a hard season quietly becomes the normal posture. The tightened boundaries, the elevated alertness, the operating at full capacity as a default — these don't expire when the emergency does. They just keep running.",
@@ -447,6 +470,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "Resilience Is Not the Same as Recovery",
     hook: "I got very good at resilience. That's exactly how I avoided recovery for so long.",
+    pullQuote: "Resilience keeps you upright. Recovery changes the underlying condition. I spent a long time confusing the two — treating continued functioning as evidence that nothing needed to change.",
     subhead: "On the difference between continuing to function and actually getting better",
     body: [
       "Resilience is the ability to keep going. It's a real capability, and in the right conditions, it's genuinely valuable. But resilience and recovery are not the same thing. Resilience keeps you upright. Recovery changes the underlying condition. I spent a long time confusing the two — treating continued functioning as evidence that nothing needed to change.",
@@ -467,6 +491,7 @@ export const LOCAL_ESSAYS = [
     readTime: "7 min",
     title: "The Permission Nobody Gives You",
     hook: "I was waiting for someone to tell me it was okay to stop. That permission was never coming from outside.",
+    pullQuote: "The permission you were waiting for exists. It just isn't located where you were looking for it.",
     subhead: "On the shift from waiting for external authorization to internal authority",
     body: [
       "For a long time, I was waiting for a signal that never came. Not consciously. I wasn't sitting in a meeting hoping someone would tell me I'd done enough. But underneath the continued performance, underneath the availability and the yes and the inbox cleared before bed, there was something that felt like waiting. Waiting for the load to ease on its own. Waiting for the situation to change. Waiting for someone to notice and say: this is too much for one person, you can let some of it go.",
