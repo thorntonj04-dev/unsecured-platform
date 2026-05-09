@@ -18,6 +18,65 @@ const TC = {
   "Internal Rules": "#5f7050", Reconfiguration: "#7a6b52",
 };
 
+const CARD_TC = {
+  Pressure:         { hex: "#8b6e52", rgba: "rgba(139,110,82,0.5)" },
+  Urgency:          { hex: "#4e6878", rgba: "rgba(78,104,120,0.5)" },
+  "Internal Rules": { hex: "#5f7050", rgba: "rgba(95,112,80,0.5)" },
+  Reconfiguration:  { hex: "#7a6b52", rgba: "rgba(122,107,82,0.5)" },
+};
+
+function CardPreview({ essay }) {
+  const wrapRef = useRef(null);
+  const [scale, setScale] = useState(0.4);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => setScale(el.offsetWidth / 1200);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const theme = CARD_TC[essay.theme] || CARD_TC.Pressure;
+  const rawQuote = essay.pullQuote || essay.hook || "";
+  const quote = rawQuote.length > 185 ? rawQuote.slice(0, 182) + "…" : rawQuote;
+  const label = essay.title.length > 65 ? essay.title.slice(0, 62) + "…" : essay.title;
+  const qfs = quote.length > 130 ? 27 : quote.length > 85 ? 31 : 36;
+
+  return (
+    <div ref={wrapRef} style={{ width: "100%", height: Math.round(630 * scale), overflow: "hidden" }}>
+      <div style={{ width: 1200, height: 630, transform: `scale(${scale})`, transformOrigin: "top left", display: "flex", background: "#0d1720" }}>
+        <div style={{ width: 8, height: "100%", background: "#b8943f", flexShrink: 0 }} />
+        <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: "52px 76px 52px 72px", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <span style={{ padding: "6px 18px", border: `1px solid ${theme.hex}`, background: theme.rgba, color: theme.hex, fontSize: 12, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "sans-serif" }}>
+              {essay.theme}
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(184,148,63,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 18, fontFamily: "sans-serif" }}>
+              FROM: {label}
+            </div>
+            <div style={{ height: 1, background: "rgba(184,148,63,0.45)", marginBottom: 32 }} />
+            <div style={{ fontSize: qfs, fontWeight: 400, fontStyle: "italic", color: "#f4efe6", lineHeight: 1.5, letterSpacing: "-0.01em", maxWidth: 980, fontFamily: "Georgia,serif" }}>
+              &ldquo;{quote}&rdquo;
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "#b8943f", letterSpacing: "0.05em", fontFamily: "sans-serif" }}>John Thornton</div>
+              <div style={{ fontSize: 14, color: "rgba(244,239,230,0.35)", letterSpacing: "0.1em", fontFamily: "sans-serif" }}>unsecured.info</div>
+            </div>
+            <div style={{ fontSize: 15, fontWeight: 900, color: "rgba(244,239,230,0.09)", letterSpacing: "0.35em", fontFamily: "sans-serif" }}>UNSECURED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Edge Functions don't run under Vite dev server — point at production origin locally.
 const OG_ORIGIN = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
   ? "https://unsecured.info"
@@ -1015,12 +1074,10 @@ function EssayPage({ essay, all, setEssay, scrollY, mobile, px }) {
               <button onClick={() => setShareOpen(false)}
                 style={{ background:"none",border:"none",cursor:"pointer",fontSize:20,color:C.g400,lineHeight:1,padding:"0 4px" }}>×</button>
             </div>
-            {/* OG card preview */}
-            <img
-              src={`${OG_ORIGIN}/api/og/${essay.id}`}
-              alt="Essay preview card"
-              style={{ width:"100%",display:"block",marginBottom:20,border:`1px solid ${C.g200}` }}
-            />
+            {/* Card preview — CSS-rendered, no network dependency */}
+            <div style={{ marginBottom:20, border:`1px solid ${C.g200}` }}>
+              <CardPreview essay={essay} />
+            </div>
             {/* Editable post blurb */}
             <p className="ss" style={{ fontSize:11,color:C.g400,letterSpacing:".08em",textTransform:"uppercase",marginBottom:8 }}>Your post</p>
             <textarea
