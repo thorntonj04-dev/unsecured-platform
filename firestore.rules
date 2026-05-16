@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Essays: anyone can read published content,
+    // only authenticated users (admin) can write
+    match /essays/{essayId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Audits: public create, auth-only read
+    match /audits/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+    }
+
+    // Waitlist: public create, auth-only read
+    match /waitlist/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+    }
+
+    // Inquiries: public create, auth-only read
+    match /inquiries/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+    }
+
+    // Subscribers: public create, auth-only read
+    match /subscribers/{id} {
+      allow read: if request.auth != null;
+      allow create, update: if true;
+    }
+
+    // Analytics: public create (anonymous tracking), auth-only read
+    match /analytics/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+    }
+
+  }
+}
