@@ -396,8 +396,7 @@ export default function App() {
         : null}
 
       {/* ── FOOTER ── */}
-      {!essay && (
-        <footer style={{ background:C.navy, color:C.cream, padding:`56px ${px} 40px`, position:"relative", overflow:"hidden" }}>
+      <footer style={{ background:C.navy, color:C.cream, padding:`56px ${px} 40px`, position:"relative", overflow:"hidden" }}>
           <CrackPanel blendMode="screen" opacity={0.06} right="0" width="26%" />
           <div style={{ maxWidth:1120, margin:"0 auto", position:"relative" }}>
             <div style={{ display:"grid", gridTemplateColumns: mobile ? "1fr 1fr" : "repeat(auto-fit,minmax(180px,1fr))", gap: mobile ? "32px 24px" : 48, marginBottom:48 }}>
@@ -437,7 +436,6 @@ export default function App() {
             </div>
           </div>
         </footer>
-      )}
     </div>
   );
 }
