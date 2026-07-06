@@ -20,7 +20,7 @@ import {
   getAuth, signInWithEmailAndPassword,
   signOut as fbSignOut, onAuthStateChanged,
 } from "firebase/auth";
-import { LOCAL_ESSAYS } from "./essays";
+import { LINKEDIN_ARTICLES } from "./essays";
 
 const {
   VITE_FIREBASE_API_KEY: apiKey,
@@ -73,7 +73,7 @@ function normalizeEssay(data) {
 }
 
 // ── PUBLIC: fetch published essays ───────────────────────────────────────────
-// Returns sorted array or null (→ fallback to LOCAL_ESSAYS).
+// Returns sorted array or null (→ fallback to LINKEDIN_ARTICLES).
 export async function fetchEssays() {
   const db = getDB();
   if (!db) return null;
@@ -96,15 +96,15 @@ export async function fetchEssays() {
 // ── ADMIN: fetch ALL essays (including drafts) ────────────────────────────────
 export async function fetchAllEssays() {
   const db = getDB();
-  if (!db) return LOCAL_ESSAYS;
+  if (!db) return LINKEDIN_ARTICLES;
   try {
     const q = query(collection(db, "essays"), orderBy("id", "asc"));
     const snap = await getDocs(q);
-    if (snap.empty) return LOCAL_ESSAYS;
+    if (snap.empty) return LINKEDIN_ARTICLES;
     return snap.docs.map(d => normalizeEssay(d.data()));
   } catch (err) {
     console.warn("fetchAllEssays failed:", err.message);
-    return LOCAL_ESSAYS;
+    return LINKEDIN_ARTICLES;
   }
 }
 
@@ -268,4 +268,4 @@ export async function fetchAnalytics() {
   }
 }
 
-export { LOCAL_ESSAYS };
+export { LINKEDIN_ARTICLES };

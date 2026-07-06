@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { saveAuditResult } from "./firebase";
 import { sendAuditResultEmail } from "./emailjs";
-import { LOCAL_ESSAYS } from "./essays";
+import { LINKEDIN_ARTICLES } from "./essays";
 
 const C = {
   navy: "#0d1720", navyMid: "#162030", navyLight: "#1e2f42",
@@ -301,7 +301,7 @@ function computeProfiles(scores) {
 }
 
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
-export default function SystemAuditPage({ mobile, px, essays: passedEssays }) {
+export default function SystemAuditPage({ mobile, px }) {
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState("intro");
   const [qIndex, setQIndex] = useState(0);
@@ -316,7 +316,7 @@ export default function SystemAuditPage({ mobile, px, essays: passedEssays }) {
   const [scores, setScores] = useState(null);
   const [fade, setFade] = useState(true);
 
-  const essays = passedEssays || LOCAL_ESSAYS;
+  const essays = LINKEDIN_ARTICLES;
   const totalQ = QUESTIONS.length;
   const progress = (qIndex / totalQ) * 100;
 

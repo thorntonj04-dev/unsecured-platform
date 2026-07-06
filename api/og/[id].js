@@ -1,5 +1,5 @@
 import { ImageResponse } from '@vercel/og';
-import { LOCAL_ESSAYS } from '../../src/essays.js';
+import { LINKEDIN_ARTICLES } from '../../src/essays.js';
 
 export const config = { runtime: 'edge' };
 
@@ -21,7 +21,7 @@ function h(type, props, ...children) {
 export default async function handler(req) {
   const url = new URL(req.url);
   const id = parseInt(url.pathname.split('/').pop(), 10);
-  const essay = LOCAL_ESSAYS.find(e => e.id === id);
+  const essay = LINKEDIN_ARTICLES.find(e => e.id === id);
 
   if (!essay) {
     return new Response('Not found', { status: 404 });
