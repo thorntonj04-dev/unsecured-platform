@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LINKEDIN_ARTICLES } from "./essays";
 import { submitInquiry, subscribeNewsletter, trackEvent, getSessionId, getDevice, getSessionReferrer } from "./firebase";
 import SystemAuditPage from "./SystemAuditPage";
