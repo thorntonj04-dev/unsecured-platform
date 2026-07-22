@@ -1,6 +1,16 @@
 export const LINKEDIN_ARTICLES = [
   {
     id: 1,
+    title: "The Illusion of Control",
+    date: "July 13, 2026",
+    readTime: "5 min",
+    hook: "A single new input can quietly recalibrate an entire system — revealing how tightly you'd been gripping things that were never yours to hold. The question isn't control. It's ownership.",
+    pullQuote: "Control often enters disguised as responsibility. Choice disappears quietly, one reasonable decision at a time.",
+    image: "https://media.licdn.com/dms/image/v2/D5612AQHW_UB-IRWjUQ/article-cover_image-shrink_720_1280/B56Z72EPdzHUAU-/0/1782244767831?e=1786579200&v=beta&t=NFJYewHSKe4lFn1Sw7Z4k26tkmg76ld15a9y1TtS__c",
+    linkedinUrl: "https://www.linkedin.com/pulse/illusion-control-john-thornton-96x1c/",
+  },
+  {
+    id: 2,
     title: "The System Overload Analogy",
     date: "July 6, 2026",
     readTime: "5 min",
@@ -10,7 +20,7 @@ export const LINKEDIN_ARTICLES = [
     linkedinUrl: "https://www.linkedin.com/pulse/system-overload-analogy-john-thornton-oq8ac/",
   },
   {
-    id: 2,
+    id: 3,
     title: "Pressure is a Signal, Not a Test",
     date: "June 29, 2026",
     readTime: "5 min",
@@ -20,7 +30,7 @@ export const LINKEDIN_ARTICLES = [
     linkedinUrl: "https://www.linkedin.com/pulse/pressure-signal-test-john-thornton-dpfuc/",
   },
   {
-    id: 3,
+    id: 4,
     title: "The Weight That Doesn't Show",
     date: "June 22, 2026",
     readTime: "5 min",
@@ -30,7 +40,7 @@ export const LINKEDIN_ARTICLES = [
     linkedinUrl: "https://www.linkedin.com/pulse/weight-doesnt-show-john-thornton-j1oae/",
   },
   {
-    id: 4,
+    id: 5,
     title: 'Your "Normal" is a System Failure',
     date: "June 16, 2026",
     readTime: "5 min",

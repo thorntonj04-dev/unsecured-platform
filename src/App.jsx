@@ -809,7 +809,6 @@ function ThinkingPage({ mobile, px }) {
 function WorkPage({ mobile, px }) {
   const offerings = [
     { title: "Speaking", icon: "◈", color: TC.Pressure, status: "Available", statusColor: "#4a7a5a", desc: "Keynotes on pressure, urgency, and internal configuration for leadership teams and conferences.", topics: ["Why burnout is a systems problem", "Urgency as a cultural default", "Reconfiguring how teams carry pressure"] },
-    { title: "Workshops", icon: "⊞", color: TC.Urgency, status: "In Development", statusColor: C.g400, desc: "Half-day and full-day workshops that move teams from awareness to practical reconfiguration.", topics: ["Identifying invisible internal rules", "Building latency back", "Margin by design"] },
     { title: "Advisory", icon: "◇", color: TC.Reconfiguration, status: "Limited", statusColor: C.gold, desc: "Working directly with leaders operating under configurations that no longer serve them.", topics: ["One-on-one sessions", "Leadership team alignment", "Pressure assessment"] },
   ];
 
@@ -840,7 +839,7 @@ function WorkPage({ mobile, px }) {
       {/* Offerings */}
       <div style={{ background: C.g100, padding: mobile ? `56px ${px}` : `72px ${px}` }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: mobile ? 16 : 6 }}>
+          <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(2,1fr)", gap: mobile ? 16 : 6, maxWidth: mobile ? "none" : 760, margin: mobile ? 0 : "0 auto" }}>
             {offerings.map((item, i) => (
               <Reveal key={item.title} delay={i * .08}>
                 <div style={{ background: "white", borderTop: `3px solid ${item.color}`, padding: mobile ? "28px 24px" : "40px 36px", transition: "all .26s", height: "100%", display: "flex", flexDirection: "column" }}
@@ -1043,7 +1042,7 @@ function InquiryForm({ mobile }) {
           <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>Areas of Interest</label>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {["Speaking", "Workshops", "Advisory"].map(interest => {
+              {["Speaking", "Advisory"].map(interest => {
                 const selected = form.interests.includes(interest);
                 return (
                   <button
